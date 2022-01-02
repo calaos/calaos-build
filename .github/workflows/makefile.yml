@@ -13,9 +13,9 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@master
-    - name: Checkout submodules
-      uses: textbook/git-checkout-submodule-action@master
+      uses: actions/checkout@v2
+      with:
+        submodules: recursive
       
     - name: make-pkgs-zigbee2mqtt
       run: make build-zigbee2mqtt
