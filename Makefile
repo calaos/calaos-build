@@ -14,4 +14,7 @@ docker-rm:
 	@docker image rm $(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
 
 build-iso: docker-init
-	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) mkarchiso -v -w /tmp/calaos-os-tmp calaos-os
+	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG)	 mkarchiso -v -w /tmp/calaos-os-tmp calaos-os
+
+run: build-iso
+	qemu-system-x86_64 -boot d -cdrom out/*.iso -m 512
