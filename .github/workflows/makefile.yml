@@ -15,5 +15,5 @@ jobs:
     - uses: actions/checkout@v2
     
     - name: make-iso
-      run: build-iso
+      run: make build-iso
       
