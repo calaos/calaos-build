@@ -12,8 +12,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    
+    - name: Checkout repository
+      uses: actions/checkout@master
+    - name: Checkout submodules
+      uses: textbook/git-checkout-submodule-action@master
+      
     - name: make-pkgs-zigbee2mqtt
       run: make build-zigbee2mqtt
     - name: make-pkgs-owfs
