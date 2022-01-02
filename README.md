@@ -10,7 +10,7 @@ docker build --rm -t calaos-os-builder .
 
 # Run docker container
 ```
-docker run --rm -v /Users/nico/Dev/archiso-builder:/src -t -i --privileged calaos-os-builder
+docker run --rm -v `pwd`:/src -t -i --privileged calaos-os-builder
 ```
 
 # Build iso
