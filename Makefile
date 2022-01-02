@@ -16,7 +16,7 @@ docker-rm:
 build-iso: docker-init
 	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo mkarchiso -v -w /tmp/calaos-os-tmp calaos-os
 
-build-%:
+build-%: docker-init
 	@echo "Building $*"
 	@$(DOCKER_COMMAND)  -w /src/pkgbuilds/$* $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) makepkg -s --noconfirm
 
