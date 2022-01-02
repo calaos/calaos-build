@@ -14,6 +14,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
+    - name: make-pkgs
+      run: make build-zigbee2mqtt
+      run: make build-owfs
+      run: make build-ola
+      run: make build-linuxconsoletools
+      run: make build-knxd
+      run: make build-calaos-ddns
+      run: make calaos-web-app
+      run: make calaos-server
+      run: make calaos-home
+
     - name: make-iso
       run: make build-iso
       
