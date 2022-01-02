@@ -18,7 +18,7 @@ build-iso: docker-init
 
 build-%: docker-init
 	@echo "Building $*"
-	@$(DOCKER_COMMAND)  -w /src/pkgbuilds/$* $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) makepkg -s --noconfirm
+	@$(DOCKER_COMMAND)  -w /src/pkgbuilds/$* $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) makepkg -f -s --noconfirm
 
 
 run: build-iso
