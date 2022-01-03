@@ -21,5 +21,7 @@ RUN echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 USER ${USER}
 
+COPY update_localrepo.sh /usr/sbin/update_localrepo.sh
+
 # Define entry point
 WORKDIR /src
