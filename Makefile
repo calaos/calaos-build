@@ -4,20 +4,21 @@ DOCKER_IMAGE_NAME=calaos-os-builder
 DOCKER_TAG ?= latest
 DOCKER_COMMAND = docker run -t -v $(PWD):/src --rm -w /src --privileged 
 
-print_green = /bin/echo -e "\x1b[32m\#\# $1\x1b[0m"
+print_green = /bin/echo -e "\x1b[32m$1\x1b[0m"
 
 all:
+	$(info )
+	@$(call print_green,"Available commands :")
+	@$(call print_green,"====================")	
 	@ echo
-	@$(call print_green,"  Available commands")
-	@ echo
-	@ echo "    make                          # Print this help"
-	@ echo "    make pkgbuilds-init           # Clone/Update pkgbuilds repository"
-	@ echo "    make docker-init              # Build docker image, also build after any changes in Dockerfile"
-	@ echo "    make docker-shell             # Run docker container and jump into"
-	@ echo "    make docker-rm                # Remove a previous build docker image"
-	@ echo "    make build-iso                # Build Arch ISO"
-	@ echo "    make build-|calaos-ddns|calaos-home|calaos-server|calaos-web-app|knxd|linuxconsoletools|ola|owfs|zigbee2mqtt # Build Arch package"
-	@ echo "    make run                      # Run ISO through qemu, for testing purppose"
+	@ echo "  make                          # Print this help"
+	@ echo "  make pkgbuilds-init           # Clone/Update pkgbuilds repository"
+	@ echo "  make docker-init              # Build docker image, also build after any changes in Dockerfile"
+	@ echo "  make docker-shell             # Run docker container and jump into"
+	@ echo "  make docker-rm                # Remove a previous build docker image"
+	@ echo "  make build-iso                # Build Arch ISO"
+	@ echo "  make build-|calaos-ddns|calaos-home|calaos-server|calaos-web-app|knxd|linuxconsoletools|ola|owfs|zigbee2mqtt # Build Arch package"
+	@ echo "  make run                      # Run ISO through qemu, for testing purppose"
 	@ echo
 
 pkgbuilds-init:
