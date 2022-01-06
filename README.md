@@ -1,6 +1,6 @@
 # Clone repository
 ```
-https://github.com/naguirre/calaos-os-2
+https://github.com/calaos/calaos-build
 ```
 # Build docker image
 
