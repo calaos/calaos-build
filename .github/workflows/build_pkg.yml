@@ -6,6 +6,12 @@ jobs:
   buildEvent:
     runs-on: ubuntu-latest
     steps:
+      - name: Import GPG key
+        id: import_gpg
+        uses: hashicorp/ghaction-import-gpg@v2.1.0
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       - uses: actions/checkout@v2
       - name: debug
         run: echo ${{ github.event.client_payload }}
