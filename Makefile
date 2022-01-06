@@ -39,7 +39,7 @@ build-iso: docker-init pkgbuilds-init
 
 build-%: docker-init pkgbuilds-init
 	@echo "Building $*"
-	@$(DOCKER_COMMAND)  -w /src/pkgbuilds/$* $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sh -c "sudo /usr/sbin/update_localrepo.sh ; makepkg -f -s --noconfirm"
+	@$(DOCKER_COMMAND)  -w /src/pkgbuilds/$* $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sh -c "sudo /usr/sbin/update_localrepo.sh ; makepkg -f -s --sign --noconfirm"
 	@$(DOCKER_COMMAND)  -w /src/pkgbuilds/$* $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sh -c "sudo cp /src/pkgbuilds/$*/*pkg.tar.zst /src/out/pkgs/x86_64/"
 
 
