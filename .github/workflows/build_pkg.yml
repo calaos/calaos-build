@@ -3,7 +3,7 @@ on:
   repository_dispatch:
     types: [build_pkg]
 jobs:
-  myEvent:
+  buildEvent:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
