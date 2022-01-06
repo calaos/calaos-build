@@ -8,7 +8,7 @@ RUN pacman-key --init
 RUN pacman-key --populate archlinux
 RUN pacman -Syu --noconfirm
 RUN pacman -S --noconfirm git archiso
-RUN pacman -S --noconfirm fakeroot base-devel sudo nano
+RUN pacman -S --noconfirm fakeroot base-devel sudo nano mtools syslinux
 
 # Create user and its home
 #RUN addgroup --gid ${GID} docker
@@ -20,6 +20,8 @@ RUN chown ${USER} /home/${USER}
 RUN echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 USER ${USER}
+
+COPY create_hddimg.sh /usr/sbin/create_hddimg.sh
 
 # Define entry point
 WORKDIR /src

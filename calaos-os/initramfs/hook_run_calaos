@@ -1,0 +1,26 @@
+#!/usr/bin/ash
+
+run_earlyhook() {
+    msg ":: Entering Calaos OS Initramfs"
+    cat /proc/cmdline
+}
+
+run_hook() {
+    msg ":: Entering Calaos OS Hook"
+    mkdir /calaos_root
+    sleep 1
+    mount /dev/sda /calaos_root
+    losetup -f
+    losetup /dev/loop0 /calaos_root/rootfs.img
+}
+
+# run_latehook() {
+   
+#     mount -o loop new_root/rootfs.img /new_root
+#     #mount -t ext4 /new_root/rootfs.img /calaos_root
+#     msg ":: Swith to calaos rootfs..." 
+#     /usr/bin/switch_root /calaos_root $init "$@"
+#     # exec env -i \
+#     #     "TERM=$TERM" \
+#     #     /usr/bin/switch_root /calaos_root $init "$@"
+# }

@@ -47,5 +47,12 @@ build-%: pkgbuilds-init
 	@$(call print_green,"Building $* REPO=$(REPO) ARCH=$(ARCH)")
 	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /src/scripts/build_pkg.sh "$*" "$(REPO)" "$(ARCH)" "$(COMMIT)" "$(PKGVERSION)"
 
-run: build-iso
-	qemu-system-x86_64 -boot d -cdrom out/*.iso -m 512
+docker-calaos-os-init: Dockerfile.calaos-os
+	docker build -t calaos-os:latest -f Dockerfile.calaos-os .
+
+calaos-os: docker-init docker-calaos-os-init
+	docker export $(shell docker create calaos-os:latest) --output="out/calaos-os.rootfs.tar"
+	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /usr/bin/create_hddimg.sh
+
+run: calaos-os
+	qemu-system-x86_64 -usb file:out/calaos-os.hddimg -m 1024
