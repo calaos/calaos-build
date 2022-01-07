@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v2
       - name: Import secrets
         run: |
           cat > gpg-key.asc <<- 'EOF'
@@ -21,7 +22,6 @@ jobs:
           ${{ secrets.UPLOAD_TOKEN }}
           EOF
         shell: bash
-      - uses: actions/checkout@v2
       - name: debug
         run: echo ${{ github.event.client_payload }}
       - name: make-pkgs-${{ github.event.client_payload.pkgname }}
