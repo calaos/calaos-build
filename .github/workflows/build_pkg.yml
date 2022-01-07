@@ -10,6 +10,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
       - name: Import secrets
         run: |
           cat > gpg-key.asc <<- 'EOF'
@@ -22,5 +23,11 @@ jobs:
           ${{ secrets.UPLOAD_TOKEN }}
           EOF
         shell: bash
+
       - name: make-pkgs-${{ github.event.client_payload.pkgname }}
         run: make build-${{ github.event.client_payload.pkgname }} REPO=${{ github.event.client_payload.repo }} ARCH=${{ github.event.client_payload.arch }}
+      
+      - uses: actions/upload-artifact@v2
+        with:
+          name: package
+          path: out/pkg/*/*
