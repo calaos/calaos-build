@@ -1,17 +1,19 @@
 name: Repository Dispatch
+
 on:
   repository_dispatch:
     types: [build_pkg]
+
 jobs:
   buildEvent:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Import GPG key
-        id: import_gpg
-        uses: hashicorp/ghaction-import-gpg@v2.1.0
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-          PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      - name: Import secrets
+        run: |
+        echo -e ${{ secrets.GPG_PRIVATE_KEY }} > gpg-key.asc
+        echo -e ${{ secrets.GPG_PASSPHRASE }} > passphrase.txt
+        echo -e ${{ secrets.UPLOAD_TOKEN }} > upload_token
       - uses: actions/checkout@v2
       - name: debug
         run: echo ${{ github.event.client_payload }}

@@ -1,6 +1,6 @@
 
 
-DOCKER_IMAGE_NAME=calaos-os-builder
+DOCKER_IMAGE_NAME = calaos-os-builder
 DOCKER_TAG ?= latest
 DOCKER_COMMAND = docker run -t -v $(PWD):/src --rm -w /src --privileged 
 
@@ -22,8 +22,7 @@ all:
 	@ echo
 
 pkgbuilds-init:
-	if [ ! -d pkgbuilds ]; then git clone https://github.com/calaos/pkgbuilds.git pkgbuilds; fi
-	cd pkgbuilds && git pull --rebase
+	@scripts/get_pkgbuilds.sh
 
 docker-init: Dockerfile
 	docker build -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) -f Dockerfile .
@@ -39,9 +38,7 @@ build-iso: docker-init pkgbuilds-init
 
 build-%: docker-init pkgbuilds-init
 	@echo "Building $*"
-	@$(DOCKER_COMMAND)  -w /src/pkgbuilds/$* $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sh -c "sudo /usr/sbin/update_localrepo.sh ; makepkg -f -s --sign --noconfirm"
-	@$(DOCKER_COMMAND)  -w /src/pkgbuilds/$* $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sh -c "sudo cp /src/pkgbuilds/$*/*pkg.tar.zst /src/out/pkgs/x86_64/"
-
+	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /src/scripts/build_pkg.sh $*
 
 run: build-iso
 	qemu-system-x86_64 -boot d -cdrom out/*.iso -m 512
