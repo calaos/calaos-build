@@ -11,9 +11,15 @@ jobs:
     steps:
       - name: Import secrets
         run: |
-          echo -e ${{ secrets.GPG_PRIVATE_KEY }} > gpg-key.asc
-          echo -e ${{ secrets.GPG_PASSPHRASE }} > passphrase.txt
-          echo -e ${{ secrets.UPLOAD_TOKEN }} > upload_token
+          cat > gpg-key.asc <<- 'EOF'
+          ${{ secrets.GPG_PRIVATE_KEY }}
+          EOF
+          cat > passphrase.txt <<- 'EOF'
+          ${{ secrets.GPG_PASSPHRASE }}
+          EOF
+          cat > upload_token <<- 'EOF'
+          ${{ secrets.UPLOAD_TOKEN }}
+          EOF
         shell: bash
       - uses: actions/checkout@v2
       - name: debug

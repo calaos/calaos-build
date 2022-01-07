@@ -96,7 +96,7 @@ function upload_pkg()
 
         UPLOAD_KEY=$(cat $build_dir/upload_token)
 
-        echo "Uploading..."
+        echo "Uploading package $FNAME"
         curl -X POST \
             -H "Content-Type: multipart/form-data" \
             -F "upload_key=$UPLOAD_KEY" \

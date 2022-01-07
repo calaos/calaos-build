@@ -28,3 +28,6 @@ arch="x86_64"
 
 mkdir -p $build_dir/out/pkgs/$arch
 cp $build_dir/pkgbuilds/$pkgname/*pkg.tar.zst* $build_dir/out/pkgs/$arch
+
+repo="calaos-dev"
+upload_pkg $build_dir/pkgbuilds/$pkgname/*pkg.tar.zst $repo $arch
