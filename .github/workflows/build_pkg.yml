@@ -11,9 +11,10 @@ jobs:
     steps:
       - name: Import secrets
         run: |
-        echo -e ${{ secrets.GPG_PRIVATE_KEY }} > gpg-key.asc
-        echo -e ${{ secrets.GPG_PASSPHRASE }} > passphrase.txt
-        echo -e ${{ secrets.UPLOAD_TOKEN }} > upload_token
+          echo -e ${{ secrets.GPG_PRIVATE_KEY }} > gpg-key.asc
+          echo -e ${{ secrets.GPG_PASSPHRASE }} > passphrase.txt
+          echo -e ${{ secrets.UPLOAD_TOKEN }} > upload_token
+        shell: bash
       - uses: actions/checkout@v2
       - name: debug
         run: echo ${{ github.event.client_payload }}
