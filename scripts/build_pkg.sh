@@ -9,14 +9,27 @@ fix_docker_perms
 
 if [ -z "$1" ]
 then
-    echo "No package name given. Usage: $0 calaos-ddns|calaos-home|calaos-server"
+    echo "No package name given. Usage: $0 calaos-ddns|calaos-home|calaos-server <repo> <arch>"
     exit 1
 fi
 
+arch="x86_64"
+repo="calaos-dev"
+
+if [ -z "$2" ]
+then
+    repo=$2
+fi
+
+if [ -z "$3" ]
+then
+    arch=$3
+fi
+
+setup_calaos_repo
 import_gpg_key
 
 pkgname=$1
-
 cd $build_dir/pkgbuilds/$pkgname
 
 if [ $signing_available -eq 1 ]
@@ -26,10 +39,7 @@ else
     makepkg -f -s --noconfirm
 fi
 
-arch="x86_64"
-
 mkdir -p $build_dir/out/pkgs/$arch
 cp $build_dir/pkgbuilds/$pkgname/*pkg.tar.zst* $build_dir/out/pkgs/$arch
 
-repo="calaos-dev"
 upload_pkg $build_dir/pkgbuilds/$pkgname/*pkg.tar.zst $repo $arch

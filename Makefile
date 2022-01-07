@@ -4,6 +4,9 @@ DOCKER_IMAGE_NAME = calaos-os-builder
 DOCKER_TAG ?= latest
 DOCKER_COMMAND = docker run -t -v $(PWD):/src --rm -w /src --privileged 
 
+REPO := calaos-dev
+ARCH := x86_64
+
 print_green = /bin/echo -e "\x1b[32m$1\x1b[0m"
 
 all:
@@ -40,7 +43,7 @@ build-iso: pkgbuilds-init
 
 build-%: pkgbuilds-init
 	@$(call print_green,"Building $*")
-	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /src/scripts/build_pkg.sh $*
+	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /src/scripts/build_pkg.sh $* $(REPO) $(ARCH)
 
 run: build-iso
 	qemu-system-x86_64 -boot d -cdrom out/*.iso -m 512

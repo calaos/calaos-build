@@ -116,3 +116,25 @@ function fix_docker_perms()
     #Fix permission issue for non root user calaos
     sudo chown -R calaos:docker $build_dir
 }
+
+function setup_calaos_repo()
+{
+    sudo pacman-key --recv-keys AEE23917D88BD96A
+    sudo pacman-key --lsign-key AEE23917D88BD96A
+
+    if ! grep arch.calaos.fr /etc/pacman.conf > /dev/null
+    then
+        sudo tee -a /etc/pacman.conf > /dev/null <<- 'EOF'
+[calaos]
+Server = https://arch.calaos.fr/$repo/$arch
+
+[calaos-dev]
+Server = https://arch.calaos.fr/$repo/$arch
+EOF
+    fi
+
+    #Do not fail if our repo is not usable
+    set +e
+    sudo pacman -Sy --noconfirm
+    set -e
+}
