@@ -5,6 +5,8 @@ set -e
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $SCRIPTDIR/calaos_lib.sh
 
+fix_docker_perms
+
 if [ -z "$1" ]
 then
     echo "No package name given. Usage: $0 calaos-ddns|calaos-home|calaos-server"

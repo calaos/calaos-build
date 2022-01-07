@@ -65,7 +65,7 @@ function sync_repo()
 
 function import_gpg_key()
 {
-    if [ -e $build_dir/gpg-key.asc ]
+    if [ ! -e $build_dir/gpg-key.asc ]
     then
         echo "No gpg key to import. Skipping signing..."
     else
@@ -84,7 +84,7 @@ function import_gpg_key()
 # with $repo can be: 'calaos' or 'calaos-dev'
 function upload_pkg()
 {
-    if [ -e $build_dir/upload_token ]
+    if [ ! -e $build_dir/upload_token ]
     then
         echo "No upload token set. Skipping upload..."
     else
@@ -108,4 +108,11 @@ function upload_pkg()
             -F "upload_repo=$REPO" \
             https://arch.calaos.fr/upload
     fi
+}
+
+#Set permissions on docker mounted volume which belongs to root by default
+function fix_docker_perms()
+{
+    #Fix permission issue for non root user calaos
+    sudo chown -R calaos:docker $build_dir
 }

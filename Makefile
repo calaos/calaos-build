@@ -21,23 +21,25 @@ all:
 	@ echo "  make run                      # Run ISO through qemu, for testing purppose"
 	@ echo
 
-pkgbuilds-init:
-	@scripts/get_pkgbuilds.sh
+pkgbuilds-init: docker-init
+	@$(call print_green,"Syncing pkgbuilds repo")
+	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /src/scripts/get_pkgbuilds.sh
 
 docker-init: Dockerfile
-	docker build -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) -f Dockerfile .
+	@$(call print_green,"Building docker image")
+	@docker build -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) -f Dockerfile .
 
-docker-shell: docker-init pkgbuilds-init
+docker-shell: pkgbuilds-init
 	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /bin/bash
 
 docker-rm:
 	@docker image rm $(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
 
-build-iso: docker-init pkgbuilds-init
+build-iso: pkgbuilds-init
 	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo mkarchiso -v -w /tmp/calaos-os-tmp calaos-os
 
-build-%: docker-init pkgbuilds-init
-	@echo "Building $*"
+build-%: pkgbuilds-init
+	@$(call print_green,"Building $*")
 	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /src/scripts/build_pkg.sh $*
 
 run: build-iso
