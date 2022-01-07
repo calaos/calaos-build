@@ -52,7 +52,7 @@ docker-calaos-os-init: Dockerfile.calaos-os
 
 calaos-os: docker-init docker-calaos-os-init
 	docker export $(shell docker create calaos-os:latest) --output="out/calaos-os.rootfs.tar"
-	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /usr/bin/create_hddimg.sh
+	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_hddimg.sh
 
 run: calaos-os
 	qemu-system-x86_64 -usb file:out/calaos-os.hddimg -m 1024
