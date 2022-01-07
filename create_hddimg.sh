@@ -5,7 +5,7 @@ cp -r /boot/ /src/out
 dd if=/dev/zero of=/src/out/calaos-os.hddimg bs=2048 count=1M
 mkfs.vfat /src/out/calaos-os.hddimg
 
-dd if=/dev/zero of=/src/out/rootfs.img bs=1500 count=1M
+dd if=/dev/zero of=/src/out/rootfs.img bs=1800 count=1M
 mkfs.ext4 /src/out/rootfs.img
 rm -rf /src/out/rootfs_mount
 mkdir /src/out/rootfs_mount
