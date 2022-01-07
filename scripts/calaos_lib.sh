@@ -72,6 +72,7 @@ function import_gpg_key()
         echo "Setup gpg keys"
 
         #Increase ttl cache time
+        mkdir -p $HOME/.gnupg
         cat > $HOME/.gnupg/gpg-agent.conf <<- 'EOF'
 default-cache-ttl 34560000
 max-cache-ttl 34560000
