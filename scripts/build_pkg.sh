@@ -16,12 +16,12 @@ fi
 arch="x86_64"
 repo="calaos-dev"
 
-if [ -z "$2" ]
+if [ ! -z "$2" ]
 then
     repo=$2
 fi
 
-if [ -z "$3" ]
+if [ ! -z "$3" ]
 then
     arch=$3
 fi

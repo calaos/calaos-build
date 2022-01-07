@@ -8,7 +8,7 @@ RUN pacman-key --init
 RUN pacman-key --populate archlinux
 RUN pacman -Syu --noconfirm
 RUN pacman -S --noconfirm git archiso
-RUN pacman -S --noconfirm fakeroot base-devel sudo
+RUN pacman -S --noconfirm fakeroot base-devel sudo nano
 
 # Create user and its home
 #RUN addgroup --gid ${GID} docker

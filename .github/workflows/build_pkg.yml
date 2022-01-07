@@ -22,7 +22,5 @@ jobs:
           ${{ secrets.UPLOAD_TOKEN }}
           EOF
         shell: bash
-      - name: debug
-        run: echo ${{ github.event.client_payload }}
       - name: make-pkgs-${{ github.event.client_payload.pkgname }}
         run: make build-${{ github.event.client_payload.pkgname }} REPO=${{ github.event.client_payload.repo }} ARCH=${{ github.event.client_payload.arch }}
