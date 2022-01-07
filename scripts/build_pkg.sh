@@ -26,6 +26,8 @@ then
     arch=$3
 fi
 
+echo "Building package for repo: $repo and arch: $arch"
+
 setup_calaos_repo
 import_gpg_key
 

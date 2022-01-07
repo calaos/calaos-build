@@ -42,7 +42,7 @@ build-iso: pkgbuilds-init
 	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo mkarchiso -v -w /tmp/calaos-os-tmp calaos-os
 
 build-%: pkgbuilds-init
-	@$(call print_green,"Building $*")
+	@$(call print_green,"Building $* REPO=$(REPO) ARCH=$(ARCH)")
 	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /src/scripts/build_pkg.sh $* $(REPO) $(ARCH)
 
 run: build-iso
