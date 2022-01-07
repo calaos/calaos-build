@@ -70,6 +70,13 @@ function import_gpg_key()
         echo "No gpg key to import. Skipping signing..."
     else
         echo "Setup gpg keys"
+
+        #Increase ttl cache time
+        cat > $HOME/.gnupg/gpg-agent.conf <<- 'EOF'
+default-cache-ttl 34560000
+max-cache-ttl 34560000
+EOF
+
         tmpfile=$(mktemp /tmp/gpg-calaos.XXXXXX)
         gpg --import --batch --no-tty $build_dir/gpg-key.asc
         echo "hello world" > $tmpfile
