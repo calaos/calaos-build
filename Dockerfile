@@ -21,7 +21,5 @@ RUN echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 USER ${USER}
 
-COPY create_hddimg.sh /usr/sbin/create_hddimg.sh
-
 # Define entry point
 WORKDIR /src
