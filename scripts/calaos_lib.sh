@@ -1,4 +1,4 @@
-#/bin/env bash
+#!/bin/env bash
 
 set -e
 
@@ -146,3 +146,5 @@ EOF
     sudo pacman -Sy --noconfirm
     set -e
 }
+
+
