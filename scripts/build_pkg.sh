@@ -9,7 +9,7 @@ pkgname=$1
 repo=$2
 arch=$3
 commit=$4
-pkgversion=$5
+pkgversion=$(echo $5 | tr - _)
 
 fix_docker_perms
 
@@ -49,7 +49,7 @@ then
 
 pkgver() {
   cd "$srcdir/$pkgname"
-  git describe --long --tags --always
+  echo "$(git describe --long --tags --always)" | tr - _
 }
 EOF
     fi
@@ -63,6 +63,8 @@ EOF
         #no commit set, user default master branch
         sed -E -i "s/#commit=[a-z0-9]+//" PKGBUILD
     fi
+
+    cat PKGBUILD
 fi
 
 if [ $signing_available -eq 1 ]

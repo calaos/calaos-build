@@ -25,7 +25,7 @@ jobs:
         shell: bash
 
       - name: make-pkgs-${{ github.event.client_payload.pkgname }}
-        run: make build-${{ github.event.client_payload.pkgname }} REPO=${{ github.event.client_payload.repo }} ARCH=${{ github.event.client_payload.arch }} COMMIT=${{ github.event.client_payload.commit }} VERSION=${{ github.event.client_payload.version }}
+        run: make build-${{ github.event.client_payload.pkgname }} REPO=${{ github.event.client_payload.repo }} ARCH=${{ github.event.client_payload.arch }} COMMIT=${{ github.event.client_payload.commit }} PKGVERSION=${{ github.event.client_payload.version }}
       
       - uses: actions/upload-artifact@v2
         with:
