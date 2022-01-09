@@ -34,6 +34,7 @@ RUN pacman -S --noconfirm xterm
 RUN pacman -S --noconfirm calaos-ddns calaos-web-app calaos-server calaos-home zigbee2mqtt
 
 # Create user and its home
+
 RUN groupadd -g ${GID} calaos
 RUN useradd -d /home/${USER} -r -u ${UID} -g ${GID} ${USER}
 RUN usermod -G wheel ${USER}
@@ -62,7 +63,7 @@ export EDITOR=nano \n\
 export VISUAL=nano \n\
 " >> /etc/bash.bashrc
 
-RUN pacman -S --noconfirm xinit awesome
+RUN pacman -S --noconfirm ratpoison
 
 # Remove downloaded packages & clean cache
 RUN pacman -Scc --noconfirm
@@ -74,8 +75,12 @@ COPY ./calaos-os/initramfs/mkinitcpio.conf /etc/mkinitcpio.conf
 #	@$(DOCKER_COMMAND) -it calaos-os:latest bash -c "sudo mkinitcpio /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img -k 5.15.12-arch1-1"
 RUN sudo mkinitcpio /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img -k 5.15.13-arch1-1
  
-COPY calaos-os/services/xinitrc /home/calaos/.xinitrc
+COPY calaos-os/services/xinitrc /root/.xinitrc
 COPY calaos-os/services/startx@.service /usr/lib/systemd/system
-RUN systemctl enable startx@calaos.service
 
-USER ${USER}
+RUN systemctl enable startx@root.service
+RUN systemctl enable calaos-server
+
+#RUN homectl create nico
+
+#USER ${USER}

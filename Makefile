@@ -11,6 +11,14 @@ PKGVERSION :=
 
 print_green = /bin/echo -e "\x1b[32m$1\x1b[0m"
 
+NOCACHE?=1
+
+ifeq ($(NOCACHE),1)
+NOCACHE=true
+else
+NOCACHE=false
+endif
+
 all:
 	$(info )
 	@$(call print_green,"Available commands :")
@@ -32,7 +40,7 @@ pkgbuilds-init: docker-init
 
 docker-init: Dockerfile
 	@$(call print_green,"Building docker image")
-	@docker build -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) -f Dockerfile .
+	@docker build --no-cache=$(NOCACHE) -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) -f Dockerfile .
 
 docker-shell: pkgbuilds-init
 	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /bin/bash
@@ -48,7 +56,7 @@ build-%: pkgbuilds-init
 	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /src/scripts/build_pkg.sh "$*" "$(REPO)" "$(ARCH)" "$(COMMIT)" "$(PKGVERSION)"
 
 docker-calaos-os-init: Dockerfile.calaos-os
-	docker build -t calaos-os:latest -f Dockerfile.calaos-os .
+	docker build --no-cache=$(NOCACHE) -t calaos-os:latest -f Dockerfile.calaos-os .
 
 calaos-os: docker-init docker-calaos-os-init
 	docker export $(shell docker create calaos-os:latest) --output="out/calaos-os.rootfs.tar"
