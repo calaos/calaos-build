@@ -34,7 +34,7 @@ import_gpg_key
 cd $build_dir/pkgbuilds/$pkgname
 
 #Only change PKGBUILD if it is a calaos package
-if grep 'calaos.fr' PKGBUILD > /dev/null
+if grep 'pkgname=.*calaos.*' PKGBUILD > /dev/null
 then
     echo "--> Updating PKGBUILD with version/commit"
 
