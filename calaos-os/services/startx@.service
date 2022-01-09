@@ -1,0 +1,13 @@
+[Unit]
+Description=start x server at startup
+After=graphical.target systemd-user-sessions.service
+
+[Service]
+User=%I
+WorkingDirectory=%h
+PAMName=login
+Type=simple
+ExecStart=/bin/bash -l -c startx
+
+[Install]
+WantedBy=graphical.target

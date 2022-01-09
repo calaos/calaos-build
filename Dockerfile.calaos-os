@@ -1,11 +1,27 @@
 FROM archlinux:latest
 
+# Set TERM environment variable
+ENV TERM=xterm-color
+
 ARG UID=1001
 ARG GID=1001
 ARG USER=calaos
 
+# Allow for colored output in pacman.conf
+RUN sed -e "s/#Color/Color/" -i /etc/pacman.conf
+
+# Add Calaos repository
+RUN echo -e " \n\
+[calaos-dev] \n\
+Server = https://arch.calaos.fr/calaos-dev/x86_64 \n\
+" >> /etc/pacman.conf
+
+RUN echo "coucou"
+
 RUN pacman-key --init
 RUN pacman-key --populate archlinux
+RUN pacman-key --recv-keys AEE23917D88BD96A
+RUN pacman-key --lsign-key AEE23917D88BD96A
 RUN pacman -Syy
 RUN pacman -Syu --noconfirm
 RUN pacman -S --noconfirm sudo linux systemd syslinux dosfstools
@@ -13,9 +29,9 @@ RUN pacman -S --noconfirm xorg-{server,xinit,apps} xdg-user-dirs
 RUN pacman -S --noconfirm ttf-{bitstream-vera,liberation,freefont,dejavu} freetype2
 RUN pacman -S --noconfirm xf86-video-vesa
 RUN pacman -S --noconfirm virtualbox-guest-utils
-RUN pacman -S --noconfirm awesome lightdm
-RUN pacman -S --noconfirm nano lightdm-gtk-greeter
-
+RUN pacman -S --noconfirm nano
+RUN pacman -S --noconfirm xterm
+RUN pacman -S --noconfirm calaos-ddns calaos-web-app calaos-server calaos-home zigbee2mqtt
 
 # Create user and its home
 RUN groupadd -g ${GID} calaos
@@ -27,14 +43,29 @@ RUN echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
 #RUN  mkinitcpio --generate /boot/initramfs-linux.img --kernel $(ls /lib/modules)
 RUN echo 'root:calaos' | chpasswd
+RUN echo 'calaos:calaos' | chpasswd
 RUN ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime
+
+# Set locale
+RUN sed -e "s/#en_US\.UTF-8/en_US\.UTF-8/" -i /etc/locale.gen
+RUN sed -e "s/#fr_FR\.UTF-8/fr_FR\.UTF-8/" -i /etc/locale.gen
 RUN echo "LANG=fr_FR.UTF-8" > /etc/locale.conf
 RUN echo "calaos-os" > /etc/hostname
 RUN locale-gen
 
-RUN sudo systemctl enable lightdm
+# RUN sudo systemctl enable lightdm
 
-USER ${USER}
+# Set nano as default editor
+RUN echo >> /etc/bash.bashrc
+RUN echo -e " \n\
+export EDITOR=nano \n\
+export VISUAL=nano \n\
+" >> /etc/bash.bashrc
+
+RUN pacman -S --noconfirm xinit awesome
+
+# Remove downloaded packages & clean cache
+RUN pacman -Scc --noconfirm
 
 COPY ./calaos-os/initramfs/hook_run_calaos /usr/lib/initcpio/hooks/calaos
 COPY ./calaos-os/initramfs/hook_install_calaos /usr/lib/initcpio/install/calaos
@@ -42,7 +73,9 @@ COPY ./calaos-os/initramfs/mkinitcpio.conf /etc/mkinitcpio.conf
 
 #	@$(DOCKER_COMMAND) -it calaos-os:latest bash -c "sudo mkinitcpio /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img -k 5.15.12-arch1-1"
 RUN sudo mkinitcpio /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img -k 5.15.13-arch1-1
-COPY ./out/pkgs /src/out/
-COPY update_localrepo.sh /usr/sbin/update_localrepo.sh
-RUN update_localrepo.sh
-RUN pacman -Ss calaos-home calaos-server
+ 
+COPY calaos-os/services/xinitrc /home/calaos/.xinitrc
+COPY calaos-os/services/startx@.service /usr/lib/systemd/system
+RUN systemctl enable startx@calaos.service
+
+USER ${USER}
