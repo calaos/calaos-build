@@ -48,7 +48,7 @@ then
         cat >> PKGBUILD <<- 'EOF'
 
 pkgver() {
-  cd "$_srcdir"
+  cd "$srcdir/$_pkgdir"
   echo "$(git describe --long --tags --always)" | tr - _
 }
 EOF
