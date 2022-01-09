@@ -63,4 +63,4 @@ calaos-os: docker-init docker-calaos-os-init
 	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_hddimg.sh
 
 run: calaos-os
-	qemu-system-x86_64 -usb file:out/calaos-os.hddimg -m 1024
+	sudo qemu-system-x86_64 -M pc -drive if=none,id=usbstick,format=raw,file=out/calaos-os.hddimg -usb -device usb-ehci,id=ehci -device usb-storage,bus=ehci.0,drive=usbstick -m 2048
