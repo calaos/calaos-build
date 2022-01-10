@@ -1,0 +1,8 @@
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    intf0:
+      match:
+        name: *
+      dhcp4: true

@@ -7,63 +7,71 @@ ARG UID=1001
 ARG GID=1001
 ARG USER=calaos
 
-# Allow for colored output in pacman.conf
-RUN sed -e "s/#Color/Color/" -i /etc/pacman.conf
-
 # Add Calaos repository
-RUN echo -e " \n\
+RUN sed -e "s/#Color/Color/" -i /etc/pacman.conf && \
+    echo -e " \n\
+[calaos] \n\
+Server = https://arch.calaos.fr/\$repo/\$arch \n\
+SigLevel = Required DatabaseOptional \n\
 [calaos-dev] \n\
-Server = https://arch.calaos.fr/calaos-dev/x86_64 \n\
+Server = https://arch.calaos.fr/\$repo/\$arch \n\
+SigLevel = Required DatabaseOptional \n\
 " >> /etc/pacman.conf
 
-RUN echo "coucou"
+# Setup pacman
+RUN pacman-key --init && \
+    pacman-key --populate archlinux && \
+    pacman-key --recv-keys AEE23917D88BD96A && \
+    pacman-key --lsign-key AEE23917D88BD96A && \
+    pacman -Syy && \
+    pacman -Syu --noconfirm
+    
+#install default packages
+RUN pacman -S --noconfirm sudo linux systemd syslinux dosfstools \
+    tzdata dropbear openssl ca-certificates ca-certificates-mozilla wget curl \
+    pciutils usbutils less \
+    xorg-{server,xinit,apps} xdg-user-dirs \
+    ttf-{bitstream-vera,liberation,freefont,dejavu} freetype2 \
+    nano xterm \
+    haproxy linuxconsoletools \
+    influxdb grafana \
+    lua-socket \
+    tslib xf86-input-evdev xf86-input-elographics xf86-input-libinput xorg-setxkbmap \
+    xf86-video-{amdgpu,ati,fbdev,intel,nouveau,vesa,vmware} \
+    virtualbox-guest-utils \
+    ratpoison \
+    netplan
 
-RUN pacman-key --init
-RUN pacman-key --populate archlinux
-RUN pacman-key --recv-keys AEE23917D88BD96A
-RUN pacman-key --lsign-key AEE23917D88BD96A
-RUN pacman -Syy
-RUN pacman -Syu --noconfirm
-RUN pacman -S --noconfirm sudo linux systemd syslinux dosfstools
-RUN pacman -S --noconfirm xorg-{server,xinit,apps} xdg-user-dirs
-RUN pacman -S --noconfirm ttf-{bitstream-vera,liberation,freefont,dejavu} freetype2
-RUN pacman -S --noconfirm xf86-video-vesa
-RUN pacman -S --noconfirm virtualbox-guest-utils
-RUN pacman -S --noconfirm nano
-RUN pacman -S --noconfirm xterm
-RUN pacman -S --noconfirm calaos-ddns calaos-web-app calaos-server calaos-home zigbee2mqtt
+RUN pacman -S --noconfirm \
+    calaos-ddns calaos-web-app calaos-server calaos-home zigbee2mqtt
 
 # Create user and its home
 
-RUN groupadd -g ${GID} calaos
-RUN useradd -d /home/${USER} -r -u ${UID} -g ${GID} ${USER}
-RUN usermod -G wheel ${USER}
-RUN mkdir -p -m 0755 /home/${USER}
-RUN chown ${USER} /home/${USER}
-RUN echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-
-#RUN  mkinitcpio --generate /boot/initramfs-linux.img --kernel $(ls /lib/modules)
-RUN echo 'root:calaos' | chpasswd
-RUN echo 'calaos:calaos' | chpasswd
-RUN ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime
+RUN groupadd -g ${GID} calaos && \
+useradd -d /home/${USER} -r -u ${UID} -g ${GID} ${USER} && \
+    usermod -G wheel ${USER} && \
+    mkdir -p -m 0755 /home/${USER} && \
+    chown ${USER} /home/${USER} && \
+    echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
+    echo 'root:calaos' | chpasswd && \
+    echo 'calaos:calaos' | chpasswd
 
 # Set locale
-RUN sed -e "s/#en_US\.UTF-8/en_US\.UTF-8/" -i /etc/locale.gen
-RUN sed -e "s/#fr_FR\.UTF-8/fr_FR\.UTF-8/" -i /etc/locale.gen
-RUN echo "LANG=fr_FR.UTF-8" > /etc/locale.conf
-RUN echo "calaos-os" > /etc/hostname
-RUN locale-gen
-
-# RUN sudo systemctl enable lightdm
+RUN ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime && \
+    sed -e "s/#en_US\.UTF-8/en_US\.UTF-8/" -i /etc/locale.gen && \
+    sed -e "s/#fr_FR\.UTF-8/fr_FR\.UTF-8/" -i /etc/locale.gen && \
+    echo "LANG=fr_FR.UTF-8" > /etc/locale.conf && \
+    echo "calaos-os" > /etc/hostname && \
+    echo "KEYMAP=fr-latin1" > /etc/vconsole.conf && \
+    locale-gen
 
 # Set nano as default editor
-RUN echo >> /etc/bash.bashrc
-RUN echo -e " \n\
+RUN echo >> /etc/bash.bashrc && \
+    echo -e " \n\
 export EDITOR=nano \n\
 export VISUAL=nano \n\
+alias ll='ls -l' \n\
 " >> /etc/bash.bashrc
-
-RUN pacman -S --noconfirm ratpoison
 
 # Remove downloaded packages & clean cache
 RUN pacman -Scc --noconfirm
@@ -72,14 +80,21 @@ COPY ./calaos-os/initramfs/hook_run_calaos /usr/lib/initcpio/hooks/calaos
 COPY ./calaos-os/initramfs/hook_install_calaos /usr/lib/initcpio/install/calaos
 COPY ./calaos-os/initramfs/mkinitcpio.conf /etc/mkinitcpio.conf
 
-#	@$(DOCKER_COMMAND) -it calaos-os:latest bash -c "sudo mkinitcpio /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img -k 5.15.12-arch1-1"
+#   @$(DOCKER_COMMAND) -it calaos-os:latest bash -c "sudo mkinitcpio /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img -k 5.15.12-arch1-1"
 RUN sudo mkinitcpio /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img -k 5.15.13-arch1-1
  
 COPY calaos-os/services/xinitrc /root/.xinitrc
 COPY calaos-os/services/startx@.service /usr/lib/systemd/system
+COPY calaos-os/services/netplan.yml /etc/netplan/calaos.yml
 
-RUN systemctl enable startx@root.service
-RUN systemctl enable calaos-server
+#disable ratpoison info message at startup
+RUN echo "startup_message off" > /root/.ratpoisonrc
+
+RUN systemctl enable \
+        startx@root.service \
+        calaos-server \
+        systemd-networkd.service
+
 
 #RUN homectl create nico
 

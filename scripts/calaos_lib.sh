@@ -2,8 +2,46 @@
 
 set -e
 
+NOCOLOR='\033[0m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+ORANGE='\033[0;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+LIGHTGRAY='\033[0;37m'
+DARKGRAY='\033[1;30m'
+LIGHTRED='\033[1;31m'
+LIGHTGREEN='\033[1;32m'
+YELLOW='\033[1;33m'
+LIGHTBLUE='\033[1;34m'
+LIGHTPURPLE='\033[1;35m'
+LIGHTCYAN='\033[1;36m'
+WHITE='\033[1;37m'
+
 export build_dir="/src"
+export outdir="$build_dir/out"
 export signing_available=0
+
+function green()
+{
+    echo -e "${LIGHTGREEN}$@${NOCOLOR}"
+}
+
+function info()
+{
+    echo -e "${CYAN}$@${NOCOLOR}"
+}
+
+function warn()
+{
+    echo -e "${ORANGE}$@${NOCOLOR}"
+}
+
+function err()
+{
+    echo -e "${LIGHTRED}$@${NOCOLOR}"
+}
 
 #Usage: get_version /path/to/repo
 function get_version()
@@ -135,9 +173,11 @@ function setup_calaos_repo()
         sudo tee -a /etc/pacman.conf > /dev/null <<- 'EOF'
 [calaos]
 Server = https://arch.calaos.fr/$repo/$arch
+SigLevel = Required DatabaseOptional
 
 [calaos-dev]
 Server = https://arch.calaos.fr/$repo/$arch
+SigLevel = Required DatabaseOptional
 EOF
     fi
 
