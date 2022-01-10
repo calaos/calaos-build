@@ -2,7 +2,7 @@
 
 DOCKER_IMAGE_NAME = calaos-os-builder
 DOCKER_TAG ?= latest
-DOCKER_COMMAND = docker run -t -v $(PWD):/src --rm -w /src --privileged 
+DOCKER_COMMAND = docker run -t -v $(PWD):/src --rm -w /src --privileged=true
 
 REPO := calaos-dev
 ARCH := x86_64
