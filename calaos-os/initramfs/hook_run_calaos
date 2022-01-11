@@ -1,26 +1,110 @@
 #!/usr/bin/ash
 
+find_dev_by_path () {
+    local path="${1}"
+    local tmp_mnt=/tmp_mnt
+    local _mnt
+    local a d
+    local device
+
+    [[ "$path" ]] || return 1
+
+    mkdir -p "${tmp_mnt}"
+
+    for a in 1 2 3; do
+        for d in $(awk '{ print "/dev/"$4 }' /proc/partitions); do
+
+            # If the device is already mounted, it shouldn't be
+            # unmounted after the check.
+
+            grep -q "^$d " /proc/mounts && {
+                _mnt=$(grep "^$d " /proc/mounts | cut -d ' ' -f 2)
+                unmount=
+            } || {
+                mount -r -t auto "${d}" "${tmp_mnt}" 2> /dev/null || continue
+                _mnt="${tmp_mnt}"
+                unmount=true
+            }
+
+            # File exists in $d. Save $d on $device.
+
+            [[ -f "${_mnt}/${path}" ]] && device="${d}"
+            [[ "${unmount}" ]] && umount "${tmp_mnt}" 2> /dev/null || true
+            [[ "${device}" ]] && {
+                echo "${device}"
+                return
+            }
+
+        done
+        sleep 1
+    done
+    return 1
+}
+
+# args: device, mountpoint, flags, opts
+_mnt_dev() {
+    local dev="${1}"
+    local mnt="${2}"
+    local flg="${3}"
+    local opts="${4}"
+
+    mkdir -p "${mnt}"
+
+    msg ":: Mounting '${dev}' to '${mnt}'"
+
+    while ! poll_device "${dev}" 30; do
+        echo "ERROR: '${dev}' device did not show up after 30 seconds..."
+        echo "   Falling back to interactive prompt"
+        echo "   You can try to fix the problem manually, log out when you are finished"
+        launch_interactive_shell
+    done
+
+    if mount -o "${opts}" "${flg}" "${dev}" "${mnt}"; then
+        msg ":: Device '${dev}' mounted successfully."
+    else
+        echo "ERROR; Failed to mount '${dev}'"
+        echo "   Falling back to interactive prompt"
+        echo "   You can try to fix the problem manually, log out when you are finished"
+        launch_interactive_shell
+    fi
+}
+
 run_earlyhook() {
     msg ":: Entering Calaos OS Initramfs"
     cat /proc/cmdline
+
+    [[ -z "${img_loop}" ]] && img_loop="rootfs.img"
+    [[ -z "${img_flags}" ]] && img_flags="defaults"
 }
 
 run_hook() {
     msg ":: Entering Calaos OS Hook"
-    mkdir /calaos_root
-    sleep 1
-    mount /dev/sda /calaos_root
-    losetup -f
-    losetup /dev/loop0 /calaos_root/rootfs.img
+
+    msg ":: Searching device with $img_loop"
+
+    #search all devices for rootfs
+    img_dev=$(find_dev_by_path "${img_loop}")
+
+    msg ":: Found rootfs on device: $img_dev"
+
+    mount_handler="calaos_loop_mount_handler"
 }
 
-# run_latehook() {
-   
-#     mount -o loop new_root/rootfs.img /new_root
-#     #mount -t ext4 /new_root/rootfs.img /calaos_root
-#     msg ":: Swith to calaos rootfs..." 
-#     /usr/bin/switch_root /calaos_root $init "$@"
-#     # exec env -i \
-#     #     "TERM=$TERM" \
-#     #     /usr/bin/switch_root /calaos_root $init "$@"
-# }
+# args: new_root
+calaos_loop_mount_handler () {
+    newroot="${1}"
+
+    local _dev_loop
+
+    msg ":: Setup a loop device from rootfs.img located at device ${img_dev}"
+    _mnt_dev "${img_dev}" "/calaos_root" "-w" "${img_flags}"
+
+    if _dev_loop=$(losetup --find --show "/calaos_root/${img_loop}"); then
+        loop_device="${_dev_loop}"
+    else
+        echo "ERROR: Setting loopback device for file '/calaos_root/${img_loop}'"
+        launch_interactive_shell
+    fi
+
+    _mnt_dev "${loop_device}" "${newroot}" "-w" "defaults"
+}
