@@ -81,7 +81,7 @@ COPY calaos-os/initramfs/hook_install_calaos /usr/lib/initcpio/install/calaos
 COPY calaos-os/initramfs/mkinitcpio.conf /etc/mkinitcpio.conf
 
 #   @$(DOCKER_COMMAND) -it calaos-os:latest bash -c "sudo mkinitcpio /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img -k 5.15.12-arch1-1"
-RUN sudo mkinitcpio /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img -k 5.15.13-arch1-1
+RUN sudo mkinitcpio /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img -k `ls /usr/lib/modules`
  
 COPY calaos-os/services/xinitrc /root/.xinitrc
 COPY calaos-os/services/startx@.service /usr/lib/systemd/system
