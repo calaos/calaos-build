@@ -45,9 +45,11 @@ cat << EOF > /mnt/efi/loader/entries/calaos.conf
 title   Calaos
 linux   /vmlinuz-linux
 initrd  /initramfs-linux.img
-options root="LABEL=calaos" rw
+options root="PARTLABEL=calaos" rw
 EOF
 
 mkinitcpio /mnt/efi/vmlinuz-linux -c /etc/mkinitcpio.conf -g /mnt/efi/initramfs-linux.img -k `ls /usr/lib/modules`
+cp /boot/vmlinuz-linux /mnt/efi
+
 umount /mnt/efi
 
