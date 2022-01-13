@@ -70,24 +70,28 @@ _mnt_dev() {
 }
 
 run_earlyhook() {
-    msg ":: Entering Calaos OS Initramfs"
-    cat /proc/cmdline
+    if [ "$LABEL" = "live" ]; then
+        msg ":: Entering Calaos OS Initramfs"
+        cat /proc/cmdline
 
-    [[ -z "${img_loop}" ]] && img_loop="rootfs.img"
-    [[ -z "${img_flags}" ]] && img_flags="defaults"
+        [[ -z "${img_loop}" ]] && img_loop="rootfs.img"
+        [[ -z "${img_flags}" ]] && img_flags="defaults"
+    fi
 }
 
 run_hook() {
-    msg ":: Entering Calaos OS Hook"
+    if [ "$LABEL" = "live" ]; then
+        msg ":: Entering Calaos OS Hook"
 
-    msg ":: Searching device with $img_loop"
+        msg ":: Searching device with $img_loop"
 
-    #search all devices for rootfs
-    img_dev=$(find_dev_by_path "${img_loop}")
+        #search all devices for rootfs
+        img_dev=$(find_dev_by_path "${img_loop}")
 
-    msg ":: Found rootfs on device: $img_dev"
+        msg ":: Found rootfs on device: $img_dev"
 
-    mount_handler="calaos_loop_mount_handler"
+        mount_handler="calaos_loop_mount_handler"
+    fi
 }
 
 # args: new_root
