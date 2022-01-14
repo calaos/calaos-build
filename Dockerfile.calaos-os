@@ -39,7 +39,7 @@ RUN pacman -S --noconfirm sudo linux systemd syslinux dosfstools \
     tslib xf86-input-evdev xf86-input-elographics xf86-input-libinput xorg-setxkbmap \
     xf86-video-{amdgpu,ati,fbdev,intel,nouveau,vesa,vmware} \
     virtualbox-guest-utils \
-    ratpoison parted pv
+    ratpoison parted arch-install-scripts rsync
 
 RUN pacman -S --noconfirm \
     calaos-ddns calaos-web-app calaos-server calaos-home zigbee2mqtt
