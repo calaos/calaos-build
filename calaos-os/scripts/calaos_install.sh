@@ -14,7 +14,7 @@ dd if=/dev/zero of=${disk} bs=512 count=35
 parted -s ${disk} mklabel gpt
 parted ${disk} mkpart "efi" fat32 1MiB 513MiB
 mkfs.vfat -F32 ${disk}1
-parted ${disk} set 1 boot on
+parted ${disk} set 1 esp on
 
 # Create Swap partition (2GiB)
 parted -s ${disk} mkpart "swap" linux-swap 513MiB 2.5GiB
@@ -29,6 +29,8 @@ pv -tpreb /mnt/from/rootfs.img  | dd of=${disk}3 bs=64M
 e2fsck -f ${disk}3 -y
 resize2fs ${disk}3
 umount ${from}
+
+#TODO: remove /.calaos-live file on dest rootfs
 
 mkdir -p /mnt/efi
 mount ${disk}1 /mnt/efi

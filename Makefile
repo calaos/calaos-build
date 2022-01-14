@@ -59,8 +59,10 @@ docker-calaos-os-init: Dockerfile.calaos-os
 	docker build --no-cache=$(NOCACHE) -t calaos-os:latest -f Dockerfile.calaos-os .
 
 calaos-os: docker-init docker-calaos-os-init
-	docker export $(shell docker create calaos-os:latest) --output="out/calaos-os.rootfs.tar"
+	@mkdir -p out
+	@$(call print_green,"Export rootfs from docker")
+	@docker export $(shell docker create calaos-os:latest) --output="out/calaos-os.rootfs.tar"
 	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_hddimg.sh
 
 run: calaos-os
-	sudo qemu-system-x86_64 -M pc -drive if=none,id=usbstick,format=raw,file=out/calaos-os.hddimg -usb -device usb-ehci,id=ehci -device usb-storage,bus=ehci.0,drive=usbstick -m 2048
+	sudo qemu-system-x86_64 -M pc -drive if=none,id=usbstick,format=raw,file=out/calaos-os.hddimg -usb -device usb-ehci,id=ehci -device usb-storage,bus=ehci.0,drive=usbstick -m 2048 -net nic,model=virtio -net user

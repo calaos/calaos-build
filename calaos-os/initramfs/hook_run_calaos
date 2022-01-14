@@ -69,46 +69,28 @@ _mnt_dev() {
     fi
 }
 
-run_earlyhook() {
-    if [ "$LABEL" = "live" ]; then
-        msg ":: Entering Calaos OS Initramfs"
-        cat /proc/cmdline
-
-        [[ -z "${img_loop}" ]] && img_loop="rootfs.img"
-        [[ -z "${img_flags}" ]] && img_flags="defaults"
-    fi
-}
-
 run_hook() {
-    if [ "$LABEL" = "live" ]; then
+    if [ "$LABEL" = "live" ] || [ "$LABEL" = "live-efi" ]
+    then
+        [[ -z "${img_file}" ]] && img_file=".calaos-live"
+        [[ -z "${img_flags}" ]] && img_flags="defaults"
+
         msg ":: Entering Calaos OS Hook"
 
-        msg ":: Searching device with $img_loop"
+        msg ":: Searching live rootfs"
+        rootfs_dev=$(find_dev_by_path "${img_file}")
 
-        #search all devices for rootfs
-        img_dev=$(find_dev_by_path "${img_loop}")
-
-        msg ":: Found rootfs on device: $img_dev"
-
-        mount_handler="calaos_loop_mount_handler"
+        if [[ "$rootfs_dev" ]]
+        then
+            msg ":: Found rootfs on device: $rootfs_dev"
+            mount_handler="calaos_live_loop_mount_handler"
+        fi
     fi
 }
 
 # args: new_root
-calaos_loop_mount_handler () {
+calaos_live_loop_mount_handler () {
     newroot="${1}"
 
-    local _dev_loop
-
-    msg ":: Setup a loop device from rootfs.img located at device ${img_dev}"
-    _mnt_dev "${img_dev}" "/calaos_root" "-w" "${img_flags}"
-
-    if _dev_loop=$(losetup --find --show "/calaos_root/${img_loop}"); then
-        loop_device="${_dev_loop}"
-    else
-        echo "ERROR: Setting loopback device for file '/calaos_root/${img_loop}'"
-        launch_interactive_shell
-    fi
-
-    _mnt_dev "${loop_device}" "${newroot}" "-w" "defaults"
+    _mnt_dev "${rootfs_dev}" "${newroot}" "-w" "defaults"
 }
