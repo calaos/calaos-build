@@ -28,6 +28,7 @@ RUN pacman-key --init && \
     
 #install default packages
 RUN pacman -S --noconfirm sudo linux systemd syslinux dosfstools \
+    cloud-utils gptfdisk \
     tzdata dropbear openssl ca-certificates ca-certificates-mozilla wget curl \
     pciutils usbutils less \
     xorg-{server,xinit,apps} xdg-user-dirs \
@@ -76,10 +77,9 @@ RUN pacman -Scc --noconfirm
 
 COPY calaos-os/initramfs/hook_run_calaos /usr/lib/initcpio/hooks/calaos
 COPY calaos-os/initramfs/hook_install_calaos /usr/lib/initcpio/install/calaos
-COPY calaos-os/initramfs/mkinitcpio.conf /etc/mkinitcpio.conf
+COPY calaos-os/initramfs/mkinitcpio.conf /etc/mkinitcpio-live.conf
 
-#   @$(DOCKER_COMMAND) -it calaos-os:latest bash -c "sudo mkinitcpio /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img -k 5.15.12-arch1-1"
-RUN sudo mkinitcpio /boot/vmlinuz-linux -c /etc/mkinitcpio.conf -g /boot/initramfs-linux.img -k `ls /usr/lib/modules`
+RUN sudo mkinitcpio /boot/vmlinuz-linux -c /etc/mkinitcpio-live.conf -g /boot/initramfs-linux.img -k `ls /usr/lib/modules`
  
 COPY calaos-os/services/xinitrc /root/.xinitrc
 COPY calaos-os/services/startx@.service /usr/lib/systemd/system
@@ -93,8 +93,3 @@ RUN systemctl enable \
         startx@root.service \
         calaos-server \
         systemd-networkd.service
-
-
-#RUN homectl create nico
-
-#USER ${USER}

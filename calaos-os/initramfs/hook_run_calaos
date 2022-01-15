@@ -69,6 +69,16 @@ _mnt_dev() {
     fi
 }
 
+# args: partition device (/dev/sda1)
+get_device_from_part() {
+    local part="${1}"
+    part=${part#/dev/}
+    local disk=$(readlink /sys/class/block/$part)
+    disk=${disk%/*}
+    disk=/dev/${disk##*/}
+    echo $disk
+}
+
 run_hook() {
     if [ "$LABEL" = "live" ] || [ "$LABEL" = "live-efi" ]
     then
@@ -83,6 +93,19 @@ run_hook() {
         if [[ "$rootfs_dev" ]]
         then
             msg ":: Found rootfs on device: $rootfs_dev"
+
+            #rootfs is partition 2
+            local partnum=2
+            local rootdisk=$(get_device_from_part ${rootfs_dev})
+
+            #check if we need to resize rootfs partition to USB drive
+            if out=$(growpart --dry-run "${rootdisk}" "${partnum}") ; then
+                msg ":: Resizing rootfs to fill disk"
+                growpart --update auto "${rootdisk}" "${partnum}"
+                sleep 1
+                resize2fs "${rootfs_dev}"
+	        fi
+
             mount_handler="calaos_live_loop_mount_handler"
         fi
     fi
