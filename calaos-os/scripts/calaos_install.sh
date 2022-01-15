@@ -58,14 +58,14 @@ mkdir -p /mnt/destination_esp
 mount ${destination_esp} /mnt/destination_esp
 bootctl --path /mnt/destination_esp install
 
-cat << EOF > /mnt/destination_esp/loader/loader.conf
+cat > /mnt/destination_esp/loader/loader.conf << EOF
 default calaos.conf
 timeout 5
 console-mode max
 editor yes
 EOF
  
-cat << EOF > /mnt/destination_esp/loader/entries/calaos.conf
+cat > /mnt/destination_esp/loader/entries/calaos.conf << EOF
 title   Calaos
 linux   /vmlinuz-linux
 initrd  /initramfs-linux.img
@@ -85,4 +85,4 @@ info "--> Check destination rootfs"
 e2fsck -f ${destination_rootfs} -y
 
 
-info "--> Installation successfull, you can no reboot"
+info "--> Installation successful, you can now reboot"
