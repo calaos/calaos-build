@@ -43,7 +43,7 @@ RUN pacman -S --noconfirm sudo linux systemd syslinux dosfstools \
     ratpoison parted arch-install-scripts rsync
 
 RUN pacman -S --noconfirm \
-    calaos-ddns calaos-web-app calaos-server calaos-home zigbee2mqtt
+    calaos-ddns calaos-web-app calaos-server calaos-home calaos-install-tools zigbee2mqtt
 
 # Create user and its home
 RUN groupadd -g ${GID} calaos && \
@@ -84,7 +84,6 @@ RUN sudo mkinitcpio /boot/vmlinuz-linux -c /etc/mkinitcpio-live.conf -g /boot/in
 COPY calaos-os/services/xinitrc /root/.xinitrc
 COPY calaos-os/services/startx@.service /usr/lib/systemd/system
 COPY calaos-os/services/config.network /etc/systemd/network/config.network
-COPY calaos-os/scripts/calaos_install.sh /usr/sbin/calaos_install.sh
 
 #disable ratpoison info message at startup
 RUN echo "startup_message off" > /root/.ratpoisonrc
