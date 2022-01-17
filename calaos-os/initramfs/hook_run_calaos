@@ -103,6 +103,8 @@ run_hook() {
                 msg ":: Resizing rootfs to fill disk"
                 growpart --update auto "${rootdisk}" "${partnum}"
                 sleep 1
+                e2fsck -pf "${rootfs_dev}"
+                sleep 1
                 resize2fs "${rootfs_dev}"
 	        fi
 

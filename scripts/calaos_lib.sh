@@ -23,28 +23,28 @@ export build_dir="/src"
 export outdir="$build_dir/out"
 export signing_available=0
 
-function green()
+green()
 {
-    echo -e "${LIGHTGREEN}$@${NOCOLOR}"
+    echo -e "${LIGHTGREEN}$*${NOCOLOR}"
 }
 
-function info()
+info()
 {
-    echo -e "${CYAN}$@${NOCOLOR}"
+    echo -e "${CYAN}$*${NOCOLOR}"
 }
 
-function warn()
+warn()
 {
-    echo -e "${ORANGE}$@${NOCOLOR}"
+    echo -e "${ORANGE}$*${NOCOLOR}"
 }
 
-function err()
+err()
 {
-    echo -e "${LIGHTRED}$@${NOCOLOR}"
+    echo -e "${LIGHTRED}$*${NOCOLOR}"
 }
 
 #Usage: get_version /path/to/repo
-function get_version()
+get_version()
 {
     repo=$1
     pushd $repo > /dev/null
@@ -52,18 +52,18 @@ function get_version()
     popd > /dev/null
 }
 
-function beginsWith()
+beginsWith()
 {
     case $2 in "$1"*) true;; *) false;; esac;
 }
 
-function endsWith()
+endsWith()
 {
     case $2 in *"$1") true;; *) false;; esac;
 }
 
 #Usage: sync_repo $SRCDIR http://github.com/group/project.git master
-function sync_repo()
+sync_repo()
 {
     echo "Syncing repository $2"
 
@@ -101,7 +101,7 @@ function sync_repo()
     fi
 }
 
-function import_gpg_key()
+import_gpg_key()
 {
     if [ ! -e $build_dir/gpg-key.asc ]
     then
@@ -128,7 +128,7 @@ EOF
 
 #Usage: upload_pkg packages/calaos-ddns/calaos-ddns-1.0-1-x86_64.pkg.tar.zst $repo x86_64
 # with $repo can be: 'calaos' or 'calaos-dev'
-function upload_pkg()
+upload_pkg()
 {
     if [ ! -e $build_dir/upload_token ]
     then
@@ -157,13 +157,13 @@ function upload_pkg()
 }
 
 #Set permissions on docker mounted volume which belongs to root by default
-function fix_docker_perms()
+fix_docker_perms()
 {
     #Fix permission issue for non root user calaos
     sudo chown -R calaos:docker $build_dir
 }
 
-function setup_calaos_repo()
+setup_calaos_repo()
 {
     sudo pacman-key --recv-keys AEE23917D88BD96A
     sudo pacman-key --lsign-key AEE23917D88BD96A

@@ -33,7 +33,7 @@ RUN pacman -S --noconfirm sudo linux systemd syslinux dosfstools \
     pciutils usbutils less \
     xorg-{server,xinit,apps} xdg-user-dirs \
     ttf-{bitstream-vera,liberation,freefont,dejavu} freetype2 \
-    nano xterm \
+    nano xterm openssh jq bash zsh \
     haproxy linuxconsoletools \
     influxdb grafana \
     lua-socket \
@@ -85,10 +85,14 @@ COPY calaos-os/services/xinitrc /root/.xinitrc
 COPY calaos-os/services/startx@.service /usr/lib/systemd/system
 COPY calaos-os/services/config.network /etc/systemd/network/config.network
 
+# Enable root login for SSH
+RUN sed -i "s/PermitRootLogin without-password/PermitRootLogin yes/g" /etc/ssh/sshd_config
+
 #disable ratpoison info message at startup
 RUN echo "startup_message off" > /root/.ratpoisonrc
 
 RUN systemctl enable \
         startx@root.service \
         calaos-server \
-        systemd-networkd.service
+        systemd-networkd.service \
+        sshd.service
