@@ -60,7 +60,6 @@ RUN ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime && \
     sed -e "s/#en_US\.UTF-8/en_US\.UTF-8/" -i /etc/locale.gen && \
     sed -e "s/#fr_FR\.UTF-8/fr_FR\.UTF-8/" -i /etc/locale.gen && \
     echo "LANG=fr_FR.UTF-8" > /etc/locale.conf && \
-    echo "calaos-os" > /etc/hostname && \
     echo "KEYMAP=fr-latin1" > /etc/vconsole.conf && \
     locale-gen
 
@@ -86,7 +85,7 @@ COPY calaos-os/services/startx@.service /usr/lib/systemd/system
 COPY calaos-os/services/config.network /etc/systemd/network/config.network
 
 # Enable root login for SSH
-RUN sed -i "s/PermitRootLogin without-password/PermitRootLogin yes/g" /etc/ssh/sshd_config
+RUN sed -i 's/.*PermitRootLogin .*$/PermitRootLogin yes/g' /etc/ssh/sshd_config
 
 #disable ratpoison info message at startup
 RUN echo "startup_message off" > /root/.ratpoisonrc

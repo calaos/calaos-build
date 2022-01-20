@@ -52,6 +52,9 @@ tar xf $outdir/calaos-os.rootfs.tar -C $rootfs_mnt
 #remove the docker file on rootfs
 rm -f $rootfs_mnt/.dockerenv
 
+#setup hostname. It does not work from within docker
+echo "calaos-os" > $rootfs_mnt/etc/hostname
+
 #create a file to know we are booting a live image
 touch $rootfs_mnt/.calaos-live
 
@@ -74,7 +77,7 @@ console-mode max
 editor yes
 random-seed-mode off
 EOF
- 
+
 cat > $efi_mnt/loader/entries/calaos.conf << EOF
 title   Boot USB Calaos Live
 linux   /vmlinuz-linux
