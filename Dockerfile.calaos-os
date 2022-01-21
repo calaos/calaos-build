@@ -81,7 +81,7 @@ COPY calaos-os/initramfs/mkinitcpio.conf /etc/mkinitcpio-live.conf
 RUN sudo mkinitcpio /boot/vmlinuz-linux -c /etc/mkinitcpio-live.conf -g /boot/initramfs-linux.img -k `ls /usr/lib/modules`
  
 COPY calaos-os/services/xinitrc /root/.xinitrc
-COPY calaos-os/services/startx@.service /usr/lib/systemd/system
+COPY calaos-os/services/xsession.service /usr/lib/systemd/system
 COPY calaos-os/services/config.network /etc/systemd/network/config.network
 
 # Enable root login for SSH
@@ -91,7 +91,8 @@ RUN sed -i 's/.*PermitRootLogin .*$/PermitRootLogin yes/g' /etc/ssh/sshd_config
 RUN echo "startup_message off" > /root/.ratpoisonrc
 
 RUN systemctl enable \
-        startx@root.service \
+        xsession.service \
         calaos-server \
+        calaos-home \
         systemd-networkd.service \
         sshd.service
