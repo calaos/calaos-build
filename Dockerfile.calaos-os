@@ -10,9 +10,6 @@ ARG USER=calaos
 # Add Calaos repository
 RUN sed -e "s/#Color/Color/" -i /etc/pacman.conf && \
     echo -e " \n\
-[calaos] \n\
-Server = https://arch.calaos.fr/\$repo/\$arch \n\
-SigLevel = Required DatabaseOptional \n\
 [calaos-dev] \n\
 Server = https://arch.calaos.fr/\$repo/\$arch \n\
 SigLevel = Required DatabaseOptional \n\
@@ -69,6 +66,7 @@ RUN echo >> /etc/bash.bashrc && \
 export EDITOR=nano \n\
 export VISUAL=nano \n\
 alias ll='ls -l' \n\
+export DISPLAY=:0 \n\
 " >> /etc/bash.bashrc
 
 # Remove downloaded packages & clean cache
@@ -95,4 +93,5 @@ RUN systemctl enable \
         calaos-server \
         calaos-home \
         systemd-networkd.service \
-        sshd.service
+        sshd.service \
+        haproxy.service
