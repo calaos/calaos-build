@@ -1,5 +1,4 @@
 FROM archlinux:latest
-
 # Set TERM environment variable
 ENV TERM=xterm-color
 
@@ -37,7 +36,8 @@ RUN pacman -S --noconfirm sudo linux systemd syslinux dosfstools \
     tslib xf86-input-evdev xf86-input-elographics xf86-input-libinput xorg-setxkbmap \
     xf86-video-{amdgpu,ati,fbdev,intel,nouveau,vesa,vmware} \
     virtualbox-guest-utils xinput_calibrator \
-    ratpoison parted arch-install-scripts rsync
+    ratpoison parted arch-install-scripts rsync \
+    linux-firmware
 
 RUN pacman -S --noconfirm \
     calaos-ddns calaos-web-app calaos-server calaos-home calaos-install-tools zigbee2mqtt
