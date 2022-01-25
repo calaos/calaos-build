@@ -20,7 +20,7 @@ StandardOutput=journal
 #Wait 1s before starting X. Sometimes the dri driver is not fully loaded and Xorg start with a wrong resolution
 ExecStartPre=/usr/bin/sleep 1
 ExecStartPre=/usr/bin/chvt 8
-ExecStart=/usr/bin/startx -- vt8 -keeptty -verbose 3 -logfile /dev/null -nocursor
+ExecStart=/usr/bin/startx -- vt8 -keeptty -verbose 3 -logfile /dev/null
 Restart=always
 RestartSec=1
 
