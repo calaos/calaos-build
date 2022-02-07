@@ -37,7 +37,8 @@ RUN pacman -S --noconfirm sudo linux systemd syslinux dosfstools \
     xf86-video-{amdgpu,ati,fbdev,intel,nouveau,vesa,vmware} \
     virtualbox-guest-utils xinput_calibrator \
     ratpoison parted arch-install-scripts rsync \
-    linux-firmware
+    linux-firmware intel-ucode amd-ucode \
+    btrfs-progs grub grub-btrfs snapper util-linux efibootmgr snap-pac
 
 RUN pacman -S --noconfirm \
     calaos-ddns calaos-web-app calaos-server calaos-home calaos-install-tools zigbee2mqtt calaos-os-conf
@@ -68,6 +69,19 @@ export VISUAL=nano \n\
 alias ll='ls -l' \n\
 export DISPLAY=:0 \n\
 " >> /etc/bash.bashrc
+
+# Set os-release
+RUN echo -e 'NAME="Calaos OS"\n\
+PRETTY_NAME="Calaos OS"\n\
+ID=arch\n\
+BUILD_ID=rolling\n\
+ANSI_COLOR="38;2;23;147;209"\n\
+HOME_URL="https://calaos.fr"\n\
+DOCUMENTATION_URL="https://calaos.fr"\n\
+SUPPORT_URL="https://calaos.fr"\n\
+BUG_REPORT_URL="https://calaos.fr"\n\
+LOGO=archlinux-logo\n\
+' >> /usr/lib/os-release
 
 # Remove downloaded packages & clean cache
 RUN pacman -Scc --noconfirm
