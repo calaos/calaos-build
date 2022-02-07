@@ -19,6 +19,8 @@ RUN mkdir -p -m 0755 /home/${USER}
 RUN chown ${USER} /home/${USER}
 RUN echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
+RUN echo 'PACKAGER="Calaos <raoul-arch@calaos.fr>"' >> /etc/makepkg.conf
+
 USER ${USER}
 
 # Define entry point
