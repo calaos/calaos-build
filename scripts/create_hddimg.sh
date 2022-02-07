@@ -35,6 +35,9 @@ mkfs.vfat $efi_disk
 info "--> Format Rootfs partition"
 mkfs.ext4 $rootfs_disk
 
+uuid_rootfs=$(blkid -s UUID -o value ${rootfs_disk})
+info "--> rootfs UUID=${uuid_rootfs}"
+
 info "--> Mount rootfs"
 rootfs_mnt=$outdir/rootfs_mount
 
@@ -82,7 +85,7 @@ cat > $efi_mnt/loader/entries/calaos.conf << EOF
 title   Boot USB Calaos Live
 linux   /vmlinuz-linux
 initrd  /initramfs-linux.img
-options LABEL=live-efi rootwait rw quiet
+options LABEL=live-efi root="UUID=${uuid_rootfs}" rootwait rw quiet
 EOF
 
 #copy kernel/initramfs to EFI partition to let sd-boot find it
@@ -94,6 +97,7 @@ cp /usr/lib/syslinux/bios/*.c32 $rootfs_mnt/boot/syslinux/
 extlinux --install $rootfs_mnt/boot/syslinux
 dd bs=440 count=1 conv=notrunc if=/usr/lib/syslinux/bios/mbr.bin of=$disk
 cp /src/calaos-os/boot/syslinux.calaos.cfg $rootfs_mnt/boot/syslinux/syslinux.cfg
+sed -i "s/\$uuid_rootfs/$uuid_rootfs/g" $rootfs_mnt/boot/syslinux/syslinux.cfg
 cp /src/calaos-os/boot/splash.lss $rootfs_mnt/boot/syslinux/
 
 info "--> Umount disks"
