@@ -10,7 +10,7 @@ get_device_from_part() {
     echo $disk
 }
 
-run_latehook() {
+run_hook() {
     local rootfs_dev=$(resolve_device "$root"); # resolve devices for blkid
 
     if [ "$LABEL" = "live" ] || [ "$LABEL" = "live-efi" ]
