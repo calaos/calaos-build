@@ -1,4 +1,4 @@
-name: Build windevine
+name: Build widevine
 
 on:
   workflow_dispatch:
