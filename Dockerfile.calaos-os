@@ -90,7 +90,7 @@ COPY calaos-os/initramfs/hook_run_calaos /usr/lib/initcpio/hooks/calaos
 COPY calaos-os/initramfs/hook_install_calaos /usr/lib/initcpio/install/calaos
 COPY calaos-os/initramfs/mkinitcpio.conf /etc/mkinitcpio-live.conf
 
-RUN sudo mkinitcpio /boot/vmlinuz-linux -c /etc/mkinitcpio-live.conf -g /boot/initramfs-linux.img -k `ls /usr/lib/modules`
+RUN sudo mkinitcpio /boot/vmlinuz-linux-lts -c /etc/mkinitcpio-live.conf -g /boot/initramfs-linux-lts.img -k `ls /usr/lib/modules`
  
 COPY calaos-os/services/config.network /etc/systemd/network/config.network
 
