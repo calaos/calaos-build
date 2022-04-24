@@ -83,8 +83,8 @@ EOF
 
 cat > $efi_mnt/loader/entries/calaos.conf << EOF
 title   Boot USB Calaos Live
-linux   /vmlinuz-linux
-initrd  /initramfs-linux.img
+linux   /vmlinuz-linux-lts
+initrd  /initramfs-linux-lts.img
 options LABEL=live-efi root="UUID=${uuid_rootfs}" rootwait rw quiet
 EOF
 
