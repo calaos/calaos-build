@@ -89,7 +89,7 @@ options LABEL=live-efi root="UUID=${uuid_rootfs}" rootwait rw quiet
 EOF
 
 #copy kernel/initramfs to EFI partition to let sd-boot find it
-cp $rootfs_mnt/boot/vmlinuz-linux $rootfs_mnt/boot/initramfs-linux.img $efi_mnt/
+cp $rootfs_mnt/boot/vmlinuz-linux-lts $rootfs_mnt/boot/initramfs-linux-lts.img $efi_mnt/
 
 info "--> Install Syslinux"
 mkdir -p $rootfs_mnt/boot/syslinux
