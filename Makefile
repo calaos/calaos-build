@@ -29,8 +29,8 @@ all:
 	@ echo "  make docker-init              # Build docker image, also build after any changes in Dockerfile"
 	@ echo "  make docker-shell             # Run docker container and jump into"
 	@ echo "  make docker-rm                # Remove a previous build docker image"
-	@ echo "  make build-iso                # Build Arch ISO"
-	@ echo "  make build-|calaos-ddns|calaos-home|calaos-server|calaos-web-app|knxd|linuxconsoletools|ola|owfs|zigbee2mqtt # Build Arch package"
+	@ echo "  make calaos-os                # Build Calaos OS hddimg for installation"
+	@ echo "  make build-|calaos-ddns|calaos-home|calaos-server|calaos-web-app|knxd|linuxconsoletools|ola|owfs # Build Arch package"
 	@ echo "  make run                      # Run ISO through qemu, for testing purppose"
 	@ echo
 	@$(call print_green,"Variables values    :")
