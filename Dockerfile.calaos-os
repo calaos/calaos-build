@@ -1,4 +1,4 @@
-FROM archlinux:latest
+FROM debian:stable-slim
 # Set TERM environment variable
 ENV TERM=xterm-color
 
@@ -6,60 +6,18 @@ ARG UID=1001
 ARG GID=1001
 ARG USER=calaos
 
-# Add Calaos repository
-RUN sed -e "s/#Color/Color/" -i /etc/pacman.conf && \
-    echo -e " \n\
-[calaos-dev] \n\
-Server = https://arch.calaos.fr/\$repo/\$arch \n\
-SigLevel = Required DatabaseOptional \n\
-" >> /etc/pacman.conf
-
-# Setup pacman
-RUN pacman-key --init && \
-    pacman-key --populate archlinux && \
-    pacman-key --recv-keys AEE23917D88BD96A && \
-    pacman-key --lsign-key AEE23917D88BD96A && \
-    pacman -Syy && \
-    pacman -Syu --noconfirm
-    
-#install default packages
-RUN pacman -S --noconfirm sudo linux-lts systemd syslinux dosfstools \
-    cloud-utils gptfdisk \
-    tzdata dropbear openssl ca-certificates ca-certificates-mozilla wget curl \
-    pciutils usbutils less \
-    xorg-{server,xinit,apps} xdg-user-dirs \
-    ttf-{bitstream-vera,liberation,freefont,dejavu} freetype2 \
-    nano xterm openssh jq bash zsh \
-    haproxy linuxconsoletools \
-    influxdb grafana \
-    lua-socket \
-    tslib xf86-input-evdev xf86-input-elographics xf86-input-libinput xorg-setxkbmap \
-    xf86-video-{amdgpu,ati,fbdev,intel,nouveau,vesa,vmware} \
-    virtualbox-guest-utils xinput_calibrator \
-    ratpoison parted arch-install-scripts rsync \
-    linux-firmware intel-ucode amd-ucode \
-    btrfs-progs grub grub-btrfs snapper util-linux efibootmgr snap-pac
-
-RUN pacman -S --noconfirm \
-    calaos-ddns calaos-web-app calaos-server calaos-home calaos-install-tools zigbee2mqtt calaos-os-conf
+RUN apt -y update && \
+    apt-get install -yq --no-install-recommends openssh-server sudo
 
 # Create user and its home
-RUN groupadd -g ${GID} calaos && \
-useradd -d /home/${USER} -r -u ${UID} -g ${GID} ${USER} && \
-    usermod -G wheel ${USER} && \
-    mkdir -p -m 0755 /home/${USER} && \
-    chown ${USER} /home/${USER} && \
-    echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
-    echo 'root:calaos' | chpasswd && \
-    echo 'calaos:calaos' | chpasswd
-
-# Set locale
-RUN ln -sf /usr/share/zoneinfo/Europe/Paris /etc/localtime && \
-    sed -e "s/#en_US\.UTF-8/en_US\.UTF-8/" -i /etc/locale.gen && \
-    sed -e "s/#fr_FR\.UTF-8/fr_FR\.UTF-8/" -i /etc/locale.gen && \
-    echo "LANG=fr_FR.UTF-8" > /etc/locale.conf && \
-    echo "KEYMAP=fr-latin1" > /etc/vconsole.conf && \
-    locale-gen
+#RUN groupadd -g ${GID} calaos && \
+#useradd -d /home/${USER} -r -u ${UID} -g ${GID} ${USER} && \
+#    usermod -G wheel ${USER} && \
+#    mkdir -p -m 0755 /home/${USER} && \
+#    chown ${USER} /home/${USER} && \
+#    echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
+#    echo 'root:calaos' | chpasswd && \
+#    echo 'calaos:calaos' | chpasswd
 
 # Set nano as default editor
 RUN echo >> /etc/bash.bashrc && \
@@ -83,25 +41,5 @@ BUG_REPORT_URL="https://calaos.fr"\n\
 LOGO=archlinux-logo\n\
 ' >> /usr/lib/os-release
 
-# Remove downloaded packages & clean cache
-RUN pacman -Scc --noconfirm
-
-COPY calaos-os/initramfs/hook_run_calaos /usr/lib/initcpio/hooks/calaos
-COPY calaos-os/initramfs/hook_install_calaos /usr/lib/initcpio/install/calaos
-COPY calaos-os/initramfs/mkinitcpio.conf /etc/mkinitcpio-live.conf
-
-RUN sudo mkinitcpio /boot/vmlinuz-linux-lts -c /etc/mkinitcpio-live.conf -g /boot/initramfs-linux-lts.img -k `ls /usr/lib/modules`
- 
-COPY calaos-os/services/config.network /etc/systemd/network/config.network
-
 # Enable root login for SSH
 RUN sed -i 's/.*PermitRootLogin .*$/PermitRootLogin yes/g' /etc/ssh/sshd_config
-
-RUN systemctl enable \
-        haproxy \
-        xsession.service \
-        calaos-server \
-        calaos-home \
-        systemd-networkd.service \
-        sshd.service \
-        haproxy.service
