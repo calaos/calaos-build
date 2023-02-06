@@ -11,7 +11,7 @@ PKGVERSION :=
 
 print_green = /bin/echo -e "\x1b[32m$1\x1b[0m"
 
-NOCACHE?=1
+NOCACHE?=0
 
 ifeq ($(NOCACHE),1)
 _NOCACHE=true
@@ -42,7 +42,7 @@ all:
 
 pkgbuilds-init: docker-init
 	@$(call print_green,"Syncing pkgbuilds repo")
-	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /src/scripts/get_pkgbuilds.sh
+	# @$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /src/scripts/get_pkgbuilds.sh
 
 docker-init: Dockerfile
 	@$(call print_green,"Building docker image")
