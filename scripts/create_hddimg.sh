@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x
+set -e
 
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $SCRIPTDIR/calaos_lib.sh
@@ -10,7 +10,7 @@ cp -r /boot/ $outdir
 disk=$outdir/calaos-os.hddimg
 
 info "--> Create empty calaos-os.hddimg"
-#dd if=/dev/zero of=$disk bs=4096 count=1M
+dd if=/dev/zero of=$disk bs=4096 count=1M
 
 parted -s ${disk} mklabel msdos
 parted -s ${disk} mkpart primary fat32 1MiB 100MiB
@@ -18,11 +18,6 @@ parted -s ${disk} mkpart primary ext4 101MiB 100%
 parted -s ${disk} set 1 esp on
 parted -s ${disk} set 2 boot on
 parted -s ${disk} print
-
-#losetup -l
-#losetup --detach /dev/loop0
-#dmsetup remove /dev/mapper/loop0p1
-losetup -l
 
 #find EFI partition layout and setup loop device
 esp_start=$(fdisk -lu $disk | grep calaos-os.hddimg1 | awk '{ print $2 }')
@@ -38,7 +33,7 @@ info "--> Format EFI partition"
 mkfs.vfat $efi_disk
 
 info "--> Format Rootfs partition"
-mkfs.ext4 -F $rootfs_disk
+mkfs.ext4 $rootfs_disk
 
 uuid_rootfs=$(blkid -s UUID -o value ${rootfs_disk})
 info "--> rootfs UUID=${uuid_rootfs}"
@@ -69,18 +64,8 @@ touch $rootfs_mnt/.calaos-live
 info "--> Install systemd-boot on EFI"
 mkdir -p $efi_mnt/EFI $efi_mnt/loader/entries
 #Init machine-id for bootctl to work
-sudo systemd-machine-id-setup
-#sudo systemd-firstboot --root / --setup-machine-id
-
-mkdir -p /dev/block
-ln -sf /dev/loop0 /dev/block/7:0
-ln -sf /dev/loop1 /dev/block/7:1
-ln -sf /dev/loop2 /dev/block/7:2
-ln -sf /dev/loop3 /dev/block/7:3
-ln -sf /dev/loop4 /dev/block/7:4
-ln -sf /dev/loop5 /dev/block/7:5
-
-bootctl --no-variables  --esp-path=$efi_mnt install
+sudo systemd-firstboot --root / --setup-machine-id
+bootctl --no-variables --make-machine-id-directory=no --esp-path=$efi_mnt install
 
 #remove random-seed file from EFI. It contains an initialized entropy for faster boot
 # As we distribute our live-image for installation, we do not want to distribute the same
@@ -98,13 +83,13 @@ EOF
 
 cat > $efi_mnt/loader/entries/calaos.conf << EOF
 title   Boot USB Calaos Live
-linux   /vmlinuz-linux-lts
-initrd  /initramfs-linux-lts.img
+linux   /vmlinuz
+initrd  /initrd.img
 options LABEL=live-efi root="UUID=${uuid_rootfs}" rootwait rw quiet
 EOF
 
 #copy kernel/initramfs to EFI partition to let sd-boot find it
-cp $rootfs_mnt/boot/vmlinuz-linux-lts $rootfs_mnt/boot/initramfs-linux-lts.img $efi_mnt/
+cp $rootfs_mnt/vmlinuz $rootfs_mnt/initrd.img $efi_mnt/
 
 info "--> Install Syslinux"
 mkdir -p $rootfs_mnt/boot/syslinux
