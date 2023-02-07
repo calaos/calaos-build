@@ -2,7 +2,7 @@
 
 DOCKER_IMAGE_NAME = calaos-os-builder
 DOCKER_TAG ?= latest
-DOCKER_COMMAND = docker run -t -v $(PWD):/src --rm -w /src --privileged=true
+DOCKER_COMMAND = docker run --platform linux/amd64 -t -v $(PWD):/src --rm -w /src --privileged=true
 
 REPO := calaos-dev
 ARCH := x86_64
@@ -46,7 +46,7 @@ pkgbuilds-init: docker-init
 
 docker-init: Dockerfile
 	@$(call print_green,"Building docker image")
-	@docker build --no-cache=$(_NOCACHE) -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) -f Dockerfile .
+	@docker build --platform linux/amd64 --no-cache=$(_NOCACHE) -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) -f Dockerfile .
 
 docker-shell: pkgbuilds-init
 	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /bin/bash
@@ -59,12 +59,12 @@ build-%: pkgbuilds-init
 	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /src/scripts/build_pkg.sh "$*" "$(REPO)" "$(ARCH)" "$(COMMIT)" "$(PKGVERSION)"
 
 docker-calaos-os-init: Dockerfile.calaos-os
-	docker build --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.calaos-os .
+	docker build --platform linux/amd64 --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.calaos-os .
 
 calaos-os: docker-init docker-calaos-os-init
 	@mkdir -p out
 	@$(call print_green,"Export rootfs from docker")
-	@docker export $(shell docker create calaos-os:latest) --output="out/calaos-os.rootfs.tar"
+	@docker export $(shell docker create --platform linux/amd64 calaos-os:latest) --output="out/calaos-os.rootfs.tar"
 	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_hddimg.sh
 
 run-uefi:

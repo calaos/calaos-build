@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -x
 
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $SCRIPTDIR/calaos_lib.sh
@@ -19,6 +19,11 @@ parted -s ${disk} set 1 esp on
 parted -s ${disk} set 2 boot on
 parted -s ${disk} print
 
+#losetup -l
+#losetup --detach /dev/loop0
+#dmsetup remove /dev/mapper/loop0p1
+losetup -l
+
 #find EFI partition layout and setup loop device
 esp_start=$(fdisk -lu $disk | grep calaos-os.hddimg1 | awk '{ print $2 }')
 esp_end=$(fdisk -lu $disk | grep calaos-os.hddimg1 | awk '{ print $3 }')
@@ -33,7 +38,7 @@ info "--> Format EFI partition"
 mkfs.vfat $efi_disk
 
 info "--> Format Rootfs partition"
-mkfs.ext4 $rootfs_disk
+mkfs.ext4 -F $rootfs_disk
 
 uuid_rootfs=$(blkid -s UUID -o value ${rootfs_disk})
 info "--> rootfs UUID=${uuid_rootfs}"
@@ -64,8 +69,18 @@ touch $rootfs_mnt/.calaos-live
 info "--> Install systemd-boot on EFI"
 mkdir -p $efi_mnt/EFI $efi_mnt/loader/entries
 #Init machine-id for bootctl to work
-sudo systemd-firstboot --root / --setup-machine-id
-bootctl --no-variables --make-machine-id-directory=no --esp-path=$efi_mnt install
+sudo systemd-machine-id-setup
+#sudo systemd-firstboot --root / --setup-machine-id
+
+mkdir -p /dev/block
+ln -sf /dev/loop0 /dev/block/7:0
+ln -sf /dev/loop1 /dev/block/7:1
+ln -sf /dev/loop2 /dev/block/7:2
+ln -sf /dev/loop3 /dev/block/7:3
+ln -sf /dev/loop4 /dev/block/7:4
+ln -sf /dev/loop5 /dev/block/7:5
+
+bootctl --no-variables  --esp-path=$efi_mnt install
 
 #remove random-seed file from EFI. It contains an initialized entropy for faster boot
 # As we distribute our live-image for installation, we do not want to distribute the same
