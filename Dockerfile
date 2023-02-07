@@ -5,7 +5,8 @@ ARG GID=1001
 ARG USER=calaos
 
 RUN apt -y update && \
-    apt-get install -yq --no-install-recommends sudo mtools syslinux-utils parted
+    apt-get install -yq --no-install-recommends sudo nano mtools \
+    syslinux-utils parted fdisk dosfstools systemd udev
 
 # Create user and its home
 #RUN addgroup --gid ${GID} docker
