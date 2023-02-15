@@ -7,18 +7,19 @@ ARG GID=1001
 ARG USER=calaos
 
 RUN apt -y update && \
+    apt -y upgrade && \
     apt-get install -yq --no-install-recommends openssh-server sudo \
-    linux-image-amd64
+    linux-image-amd64 systemd bash htop
 
 # Create user and its home
-#RUN groupadd -g ${GID} calaos && \
-#useradd -d /home/${USER} -r -u ${UID} -g ${GID} ${USER} && \
-#    usermod -G wheel ${USER} && \
-#    mkdir -p -m 0755 /home/${USER} && \
-#    chown ${USER} /home/${USER} && \
-#    echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
-#    echo 'root:calaos' | chpasswd && \
-#    echo 'calaos:calaos' | chpasswd
+RUN groupadd -g ${GID} calaos && \
+useradd -d /home/${USER} -r -u ${UID} -g ${GID} ${USER} && \
+   usermod -G root ${USER} && \
+   mkdir -p -m 0755 /home/${USER} && \
+   chown ${USER} /home/${USER} && \
+   echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
+   echo 'root:calaos' | chpasswd && \
+   echo 'calaos:calaos' | chpasswd
 
 # Set nano as default editor
 RUN echo >> /etc/bash.bashrc && \
