@@ -85,7 +85,7 @@ cat > $efi_mnt/loader/entries/calaos.conf << EOF
 title   Boot USB Calaos Live
 linux   /vmlinuz
 initrd  /initrd.img
-options LABEL=live-efi root="UUID=${uuid_rootfs}" rootwait rw quiet
+options LABEL=live-efi root=UUID=${uuid_rootfs} rootwait rw debug init=/lib/systemd/systemd
 EOF
 
 #copy kernel/initramfs to EFI partition to let sd-boot find it
