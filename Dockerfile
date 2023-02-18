@@ -8,7 +8,7 @@ RUN pacman-key --init
 RUN pacman-key --populate archlinux
 RUN pacman -Syu --noconfirm
 RUN pacman -S --noconfirm git archiso
-RUN pacman -S --noconfirm fakeroot base-devel sudo nano mtools syslinux parted
+RUN pacman -S --noconfirm fakeroot base-devel sudo nano mtools syslinux parted qemu-system-aarch64
 
 # Create user and its home
 #RUN addgroup --gid ${GID} docker
