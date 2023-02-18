@@ -1,0 +1,54 @@
+FROM debian:stable
+# Set TERM environment variable
+ENV TERM=xterm-color
+
+ARG UID=1001
+ARG GID=1001
+ARG USER=calaos
+
+RUN apt -y update && \
+    apt -y upgrade && \
+    apt-get install -yq --no-install-recommends ca-certificates wget gnupg
+
+RUN wget https://archive.raspberrypi.org/debian/raspberrypi.gpg.key	-O - | apt-key add -
+RUN echo 'deb https://archive.raspberrypi.org/debian bullseye main contrib non-free' >> /etc/apt/sources.list
+
+RUN apt -y update && \
+    apt -y upgrade && \
+    apt-get install -yq --no-install-recommends openssh-server sudo \
+    raspberrypi-kernel raspi-config raspi-utils raspberrypi-bootloader systemd bash htop
+
+# Create user and its home
+RUN groupadd -g ${GID} calaos && \
+useradd -d /home/${USER} -r -u ${UID} -g ${GID} ${USER} && \
+   usermod -G root ${USER} && \
+   mkdir -p -m 0755 /home/${USER} && \
+   chown ${USER} /home/${USER} && \
+   echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
+   echo 'root:calaos' | chpasswd && \
+   echo 'calaos:calaos' | chpasswd
+
+# Set nano as default editor
+RUN echo >> /etc/bash.bashrc && \
+    echo -e " \n\
+export EDITOR=nano \n\
+export VISUAL=nano \n\
+alias ll='ls -l' \n\
+export DISPLAY=:0 \n\
+" >> /etc/bash.bashrc
+
+# Set os-release
+RUN echo -e 'NAME="Calaos OS"\n\
+PRETTY_NAME="Calaos OS"\n\
+ID=arch\n\
+BUILD_ID=rolling\n\
+ANSI_COLOR="38;2;23;147;209"\n\
+HOME_URL="https://calaos.fr"\n\
+DOCUMENTATION_URL="https://calaos.fr"\n\
+SUPPORT_URL="https://calaos.fr"\n\
+BUG_REPORT_URL="https://calaos.fr"\n\
+LOGO=archlinux-logo\n\
+' >> /usr/lib/os-release
+
+# Enable root login for SSH
+RUN sed -i 's/.*PermitRootLogin .*$/PermitRootLogin yes/g' /etc/ssh/sshd_config
