@@ -22,9 +22,9 @@ qemu-system-aarch64 \
     -sd $disk \
     -kernel $outdir/boot_mount/kernel8.img \
     -m 1G -smp 4 \
-    -serial stdio \
+    -serial mon:stdio \
     -usb -device usb-mouse -device usb-kbd \
     -device usb-net,netdev=net0 \
-    -netdev user,id=net0,hostfwd=tcp::5555-:22 \
+    -netdev user,id=net0,hostfwd=tcp::2222-:22 \
 
 umount $boot_mnt
