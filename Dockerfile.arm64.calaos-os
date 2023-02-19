@@ -16,7 +16,9 @@ RUN echo 'deb https://archive.raspberrypi.org/debian bullseye main contrib non-f
 RUN apt -y update && \
     apt -y upgrade && \
     apt-get install -yq --no-install-recommends openssh-server sudo \
-    raspberrypi-kernel raspi-config raspi-utils raspberrypi-bootloader systemd bash htop
+    systemd systemd-container systemd-timesyncd bash htop skopeo umoci \
+    raspi-config raspi-utils raspberrypi-bootloader \
+    raspberrypi-kernel raspberrypi-net-mods raspberrypi-sys-mods
 
 # Create user and its home
 RUN groupadd -g ${GID} calaos && \
