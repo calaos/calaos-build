@@ -69,10 +69,14 @@ ifeq ($(TARGET_ARCH), amd64)
 else
 	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_sdimg.sh
 endif
-	
+
+run-uefi2:
+	sudo qemu-x86_64 -m 1024 -hda out/calaos-os.hddimg -hdb out/internal.hdd -net nic,model=virtio -net user -bios /usr/share/ovmf/OVMF.fd
 
 run-uefi:
-	kvm -m 1024 -hda out/calaos-os.hddimg -hdb out/internal.hdd -net nic,model=virtio -net user -bios /usr/share/ovmf/OVMF.fd
+	kvm -m 1024 -hda out/calaos-os.hddimg -hdb out/internal.hdd \
+		-bios /usr/share/ovmf/OVMF.fd \
+		-nic user,hostfwd=tcp::2222-:22
 
 run-bios:
 	kvm -m 1024 -hda out/calaos-os.hddimg -hdb out/internal.hdd -net nic,model=virtio -net user
