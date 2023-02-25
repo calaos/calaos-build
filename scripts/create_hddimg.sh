@@ -10,7 +10,8 @@ cp -r /boot/ $outdir
 disk=$outdir/calaos-os.hddimg
 
 info "--> Create empty calaos-os.hddimg"
-dd if=/dev/zero of=$disk bs=4096 count=1M
+rm -rf $disk
+truncate -s 4G $disk
 
 parted -s ${disk} mklabel msdos
 parted -s ${disk} mkpart primary fat32 1MiB 100MiB
