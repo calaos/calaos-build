@@ -1,12 +1,12 @@
 REPO := calaos-dev
-ARCH := x86_64
+ARCH ?= amd64
 TARGET_ARCH ?= amd64
 COMMIT :=
 PKGVERSION :=
 
 DOCKER_IMAGE_NAME = calaos-os-builder
 DOCKER_TAG ?= latest
-DOCKER_COMMAND = docker run --platform linux/amd64 -t -v $(PWD):/src --rm -w /src --privileged=true
+DOCKER_COMMAND = docker run --platform linux/${ARCH} -t -v $(PWD):/src --rm -w /src --privileged=true
 
 print_green = /bin/echo -e "\x1b[32m$1\x1b[0m"
 
@@ -45,7 +45,7 @@ pkgbuilds-init: docker-init
 
 docker-init: Dockerfile
 	@$(call print_green,"Building docker image")
-	@docker build --platform linux/amd64 --no-cache=$(_NOCACHE) -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) -f Dockerfile .
+	@docker build --platform linux/${ARCH} --no-cache=$(_NOCACHE) -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) -f Dockerfile .
 
 docker-shell: pkgbuilds-init
 	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /bin/bash
