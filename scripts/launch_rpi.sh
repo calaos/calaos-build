@@ -1,3 +1,4 @@
+#!/bin/bash
 set -e
 
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
