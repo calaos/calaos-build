@@ -1,16 +1,33 @@
 REPO := calaos-dev
-ARCH ?= amd64
-TARGET_ARCH ?= amd64
 COMMIT :=
 PKGVERSION :=
 
 DOCKER_IMAGE_NAME = calaos-os-builder
 DOCKER_TAG ?= latest
-DOCKER_COMMAND = docker run --platform linux/${ARCH} -t -v $(PWD):/src --rm -w /src --privileged=true
+DOCKER_COMMAND = docker run --platform linux/${BUILDARCH} -t -v $(PWD):/src --rm -w /src --privileged=true
 
 print_green = /bin/echo -e "\x1b[32m$1\x1b[0m"
 
 NOCACHE?=0
+
+# Detect build architecture
+BUILDARCH ?= $(shell uname -m)
+ifeq ($(BUILDARCH),aarch64)
+    BUILDARCH=arm64
+endif
+ifeq ($(BUILDARCH),x86_64)
+    BUILDARCH=amd64
+endif
+
+# By default target architecture is same as build architecture, i.e no cross compiling
+TARGET_ARCH ?= $(BUILDARCH)
+
+# Override Target arch if rpi64 machine is specified
+MACHINE ?= $(TARGET_ARCH)
+ifeq ($(MACHINE),rpi64)
+    override TARGET_ARCH=arm64
+endif
+
 
 ifeq ($(NOCACHE),1)
 _NOCACHE=true
@@ -45,7 +62,7 @@ pkgbuilds-init: docker-init
 
 docker-init: Dockerfile
 	@$(call print_green,"Building docker image")
-	@docker build --platform linux/${ARCH} --no-cache=$(_NOCACHE) -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) -f Dockerfile .
+	@docker build --platform linux/${BUILDARCH} --no-cache=$(_NOCACHE) -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) -f Dockerfile .
 
 docker-shell: pkgbuilds-init
 	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /bin/bash
@@ -54,32 +71,30 @@ docker-rm:
 	@docker image rm $(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
 
 build-%: pkgbuilds-init
-	@$(call print_green,"Building $* REPO=$(REPO) ARCH=$(ARCH)")
-	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /src/scripts/build_pkg.sh "$*" "$(REPO)" "$(ARCH)" "$(COMMIT)" "$(PKGVERSION)"
+	@$(call print_green,"Building $* REPO=$(REPO) ARCH=$(BUILDARCH)")
+	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /src/scripts/build_pkg.sh "$*" "$(REPO)" "$(BUILDARCH)" "$(COMMIT)" "$(PKGVERSION)"
 
 docker-calaos-os-init: Dockerfile.$(TARGET_ARCH).calaos-os
-	docker build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.$(TARGET_ARCH).calaos-os .
+	docker build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.calaos-os .
+	docker build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.$(MACHINE).calaos-os .
 
 calaos-os: docker-init docker-calaos-os-init
 	@mkdir -p out
 	@$(call print_green,"Export rootfs from docker")
 	@docker export $(shell docker create --platform linux/$(TARGET_ARCH) calaos-os:latest) --output="out/calaos-os.rootfs.tar"
-ifeq ($(TARGET_ARCH), amd64)
-	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_hddimg.sh
-else
+ifeq ($(MACHINE), rpi64)
 	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_sdimg.sh
+else
+	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_hddimg.sh
 endif
 
-run-uefi2:
-	sudo qemu-x86_64 -m 1024 -hda out/calaos-os.hddimg -hdb out/internal.hdd -net nic,model=virtio -net user -bios /usr/share/ovmf/OVMF.fd
-
-run-uefi:
+run-amd64:
 	kvm -m 1024 -hda out/calaos-os.hddimg -hdb out/internal.hdd \
 		-bios /usr/share/ovmf/OVMF.fd \
 		-nic user,hostfwd=tcp::2222-:22
 
-run-bios:
-	kvm -m 1024 -hda out/calaos-os.hddimg -hdb out/internal.hdd -net nic,model=virtio -net user
-
-run-rpi:
-	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/launch_rpi.sh
+run-arm64:
+		scripts/launch_arm64.sh
+run-rpi64:
+	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) \
+		sudo /src/scripts/launch_rpi.sh

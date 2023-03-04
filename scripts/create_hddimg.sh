@@ -65,7 +65,7 @@ touch $rootfs_mnt/.calaos-live
 info "--> Install systemd-boot on EFI"
 mkdir -p $efi_mnt/EFI $efi_mnt/loader/entries
 #Init machine-id for bootctl to work
-sudo systemd-firstboot --root / --setup-machine-id
+#sudo systemd-firstboot --root / --setup-machine-id
 bootctl --no-variables --make-machine-id-directory=no --esp-path=$efi_mnt install
 
 #remove random-seed file from EFI. It contains an initialized entropy for faster boot
@@ -86,20 +86,20 @@ cat > $efi_mnt/loader/entries/calaos.conf << EOF
 title   Boot USB Calaos Live
 linux   /vmlinuz
 initrd  /initrd.img
-options LABEL=live-efi root=UUID=${uuid_rootfs} rootwait rw debug init=/lib/systemd/systemd
+options LABEL=live-efi root=UUID=${uuid_rootfs} rootwait rw init=/lib/systemd/systemd
 EOF
 
 #copy kernel/initramfs to EFI partition to let sd-boot find it
 cp $rootfs_mnt/vmlinuz $rootfs_mnt/initrd.img $efi_mnt/
 
-info "--> Install Syslinux"
-mkdir -p $rootfs_mnt/boot/syslinux
-cp /usr/lib/syslinux/bios/*.c32 $rootfs_mnt/boot/syslinux/
-extlinux --install $rootfs_mnt/boot/syslinux
-dd bs=440 count=1 conv=notrunc if=/usr/lib/syslinux/bios/mbr.bin of=$disk
-cp /src/calaos-os/boot/syslinux.calaos.cfg $rootfs_mnt/boot/syslinux/syslinux.cfg
-sed -i "s/\$uuid_rootfs/$uuid_rootfs/g" $rootfs_mnt/boot/syslinux/syslinux.cfg
-cp /src/calaos-os/boot/splash.lss $rootfs_mnt/boot/syslinux/
+# info "--> Install Syslinux"
+# mkdir -p $rootfs_mnt/boot/syslinux
+# cp /usr/lib/syslinux/bios/*.c32 $rootfs_mnt/boot/syslinux/
+# extlinux --install $rootfs_mnt/boot/syslinux
+# dd bs=440 count=1 conv=notrunc if=/usr/lib/syslinux/bios/mbr.bin of=$disk
+# cp /src/calaos-os/boot/syslinux.calaos.cfg $rootfs_mnt/boot/syslinux/syslinux.cfg
+# sed -i "s/\$uuid_rootfs/$uuid_rootfs/g" $rootfs_mnt/boot/syslinux/syslinux.cfg
+# cp /src/calaos-os/boot/splash.lss $rootfs_mnt/boot/syslinux/
 
 info "--> Umount disks"
 umount $efi_mnt
