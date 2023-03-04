@@ -1,0 +1,59 @@
+FROM debian:stable
+# Set TERM environment variable
+ENV TERM=xterm-color
+
+ARG UID=1001
+ARG GID=1001
+ARG USER=calaos
+
+RUN apt -y update && \
+    apt -y upgrade && \
+    apt-get install -yq --no-install-recommends ca-certificates wget gnupg
+
+RUN apt -y update && \
+    apt -y upgrade && \
+    apt-get install -yq --no-install-recommends openssh-server sudo \
+    systemd systemd-container systemd-timesyncd bash htop \
+    podman skopeo umoci \
+    iproute2 ifupdown2 bridge-utils ethtool zsh net-tools nano iputils-ping \
+    curl wget
+
+# Create user and its home
+RUN groupadd -g ${GID} calaos && \
+useradd -d /home/${USER} -r -u ${UID} -g ${GID} ${USER} -s /usr/bin/zsh && \
+   usermod -G root ${USER} && \
+   mkdir -p -m 0755 /home/${USER} && \
+   chown ${USER} /home/${USER} && \
+   echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
+   echo 'root:calaos' | chpasswd && \
+   echo 'calaos:calaos' | chpasswd
+
+COPY calaos-os/services/config.network /etc/systemd/network/config.network
+
+RUN curl -sfL https://get.k3s.io | INSTALL_K3S_SKIP_ENABLE=true INSTALL_K3S_SKIP_START=true INSTALL_K3S_BIN_DIR="/usr/bin" sh -s -
+RUN systemctl enable \
+        systemd-networkd \
+        ssh
+
+# Enable root login for SSH
+RUN sed -i 's/.*PermitRootLogin .*$/PermitRootLogin yes/g' /etc/ssh/sshd_config
+
+# Set nano as default editor
+RUN echo "export EDITOR=nano \n\
+    export VISUAL=nano \n\
+    alias ll='ls -l' \n\
+    export DISPLAY=:0 \n\
+    " > /etc/bash.bashrc
+
+# Set os-release
+RUN echo 'NAME="Calaos OS"\n\
+    PRETTY_NAME="Calaos OS"\n\
+    ID=arch\n\
+    BUILD_ID=rolling\n\
+    ANSI_COLOR="38;2;23;147;209"\n\
+    HOME_URL="https://calaos.fr"\n\
+    DOCUMENTATION_URL="https://calaos.fr"\n\
+    SUPPORT_URL="https://calaos.fr"\n\
+    BUG_REPORT_URL="https://calaos.fr"\n\
+    LOGO=archlinux-logo\n\
+    ' > /usr/lib/os-release

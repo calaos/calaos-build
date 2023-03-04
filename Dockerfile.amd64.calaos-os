@@ -1,65 +1,6 @@
-FROM debian:stable-slim
-# Set TERM environment variable
-ENV TERM=xterm-color
-
-ARG UID=1001
-ARG GID=1001
-ARG USER=calaos
+FROM calaos-os:latest
 
 RUN apt -y update && \
     apt -y upgrade && \
-    apt-get install -yq --no-install-recommends ca-certificates wget gnupg
-
-RUN apt -y update && \
-    apt -y upgrade && \
-    apt-get install -yq --no-install-recommends openssh-server sudo \
-    systemd systemd-container systemd-timesyncd bash htop skopeo umoci\
-    iproute2 ifupdown2 bridge-utils ethtool zsh net-tools nano iputils-ping\
-    linux-image-amd64 
-
-# Create user and its home
-RUN groupadd -g ${GID} calaos && \
-useradd -d /home/${USER} -r -u ${UID} -g ${GID} ${USER} && \
-   usermod -G root ${USER} && \
-   mkdir -p -m 0755 /home/${USER} && \
-   chown ${USER} /home/${USER} && \
-   echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
-   echo 'root:calaos' | chpasswd && \
-   echo 'calaos:calaos' | chpasswd
-
-
-# Enable root login for SSH
-RUN sed -i 's/.*PermitRootLogin .*$/PermitRootLogin yes/g' /etc/ssh/sshd_config
-
-# Set nano as default editor
-RUN echo -e " \n\
-export EDITOR=nano \n\
-export VISUAL=nano \n\
-alias ll='ls -l' \n\
-export DISPLAY=:0 \n\
-" > /etc/bash.bashrc
-
-# Set os-release
-RUN echo 'NAME="Calaos OS"\n\
-PRETTY_NAME="Calaos OS"\n\
-ID=arch\n\
-BUILD_ID=rolling\n\
-ANSI_COLOR="38;2;23;147;209"\n\
-HOME_URL="https://calaos.fr"\n\
-DOCUMENTATION_URL="https://calaos.fr"\n\
-SUPPORT_URL="https://calaos.fr"\n\
-BUG_REPORT_URL="https://calaos.fr"\n\
-LOGO=archlinux-logo\n\
-' > /usr/lib/os-release
-
-
-RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/v1.1.5/zsh-in-docker.sh)"
-RUN chsh -s /usr/bin/zsh
-COPY calaos-os/services/config.network /etc/systemd/network/config.network
-
-RUN systemctl enable \
-        systemd-networkd.service
-
-RUN  apt-get install -yq --no-install-recommends podman
-
-RUN  apt-get install -yq x11-apps ratpoison
+    apt-get install -yq --no-install-recommends \
+        linux-image-amd64 
