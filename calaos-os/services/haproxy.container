@@ -1,0 +1,20 @@
+[Unit]
+Description=haproxy container
+
+[Container]
+ContainerName=haproxy
+Image=docker.io/haproxy:2.7.3
+PublishPort=80:80/tcp
+PublishPort=443:443/tcp
+Timezone=local
+PodmanArgs=--log-driver journald
+AddCapability=CAP_NET_BIND_SERVICE
+Volume=/data/haproxy:/usr/local/etc/haproxy:ro
+Network=host
+
+[Service]
+Restart=always
+
+[Install]
+# Start by default on boot
+WantedBy=multi-user.target default.target
