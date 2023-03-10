@@ -1,5 +1,6 @@
 FROM calaos-os:latest
 
+# Install x86_64 kernel
 RUN apt -y update && \
     apt -y upgrade && \
     apt-get install -yq --no-install-recommends \

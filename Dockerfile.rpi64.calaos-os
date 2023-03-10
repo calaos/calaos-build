@@ -1,8 +1,10 @@
 FROM calaos-os:latest
 
+# Add raspberrypi official debian repos to apt sources list.
 RUN curl -sS https://archive.raspberrypi.org/debian/raspberrypi.gpg.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/spotify.gpg
 RUN echo 'deb https://archive.raspberrypi.org/debian bullseye main contrib non-free' >> /etc/apt/sources.list
 
+# Install rpi kernel, bootloader and utils dedicated to rpi
 RUN apt -y update && \
     apt -y upgrade && \
     apt-get install -yq --no-install-recommends \
