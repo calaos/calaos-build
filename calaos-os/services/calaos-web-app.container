@@ -1,0 +1,18 @@
+[Unit]
+Description=calaos-web-app container
+#After=calaos-server.service
+
+[Container]
+ContainerName=calaos-web-app
+Image=ghcr.io/calaos/calaos-web-app:latest
+PublishPort=3000:80/tcp
+Timezone=local
+PodmanArgs=--log-driver journald
+Network=host
+
+[Service]
+Restart=always
+
+[Install]
+# Start by default on boot
+WantedBy=multi-user.target default.target
