@@ -23,3 +23,4 @@ qemu-system-aarch64 -M virt \
     -device virtio-rng-pci,rng=rng0 \
     -nographic \
     -serial mon:stdio \
+    -nic user,hostfwd=tcp::2222-:22,hostfwd=tcp::5454-:5454,hostfwd=udp::4545-:4545,hostfwd=tcp::3000-:3000,hostfwd=tcp::8080-:80,hostfwd=tcp::4443-:443 \
