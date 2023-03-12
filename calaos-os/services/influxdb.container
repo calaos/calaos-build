@@ -7,12 +7,13 @@ Image=docker.io/influxdb:1.8.10
 PublishPort=8086:8086/tcp
 Timezone=local
 PodmanArgs=--log-driver journald
-Volume=/data/influxdb/data:/var/lib/influxdb2 \
-Volume=/data/influxdb/config:/etc/influxdb2 \
+Volume=/data/influxdb/data:/var/lib/influxdb2
+Volume=/data/influxdb/config:/etc/influxdb2
 Network=host
 
 [Service]
 Restart=always
+ExecStartPre=-/usr/bin/mkdir /data/influxdb/data
 
 [Install]
 # Start by default on boot

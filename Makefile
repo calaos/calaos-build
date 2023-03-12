@@ -78,9 +78,14 @@ docker-calaos-os-init: Dockerfile.$(TARGET_ARCH).calaos-os
 	docker build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.calaos-os .
 	docker build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.$(MACHINE).calaos-os .
 
+
 calaos-os: docker-init docker-calaos-os-init
 	@mkdir -p out
 	@$(call print_green,"Export rootfs from docker")
+	# skopeo copy docker-daemon:calaos-os:latest oci:out/calaos-os:latest 
+	# rm -rf out/calaos-os.rootfs
+	# umoci unpack --rootless --image out/calaos-os out/calaos-os.rootfs
+	# cd out/calaos-os.rootfs/rootfs && tar cf ../../calaos-os.rootfs.tar .
 	@docker export $(shell docker create --platform linux/$(TARGET_ARCH) calaos-os:latest) --output="out/calaos-os.rootfs.tar"
 ifeq ($(MACHINE), rpi64)
 	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_sdimg.sh

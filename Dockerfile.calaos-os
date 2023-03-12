@@ -1,17 +1,3 @@
-# FROM debian:stable as quadlet-builder
-
-# RUN apt -y update && \
-#     apt -y upgrade && \
-#     apt-get install -yq --no-install-recommends ca-certificates wget curl gnupg \
-#     git meson build-essential pkg-config libglib2.0-dev 
-
-# RUN git clone https://github.com/containers/quadlet.git
-# RUN cd quadlet && \
-#         meson builddir  --prefix /usr && \
-#         cd builddir && \
-#         meson compile && \
-#         DESTDIR=/opt meson install 
-
 FROM debian:bookworm-slim
 # Set TERM environment variable 
 ENV TERM=xterm-color
@@ -25,7 +11,7 @@ RUN apt -y update && \
     apt-get install -yq --no-install-recommends ca-certificates wget curl gnupg \
     openssh-server sudo systemd systemd-container systemd-timesyncd bash htop \
     iproute2 ifupdown2 bridge-utils ethtool  net-tools  iputils-ping libgpgme11 libyajl2 \
-    zsh nano git
+    zsh nano git skopeo fuse-overlayfs
 
 RUN echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/unstable/Debian_Testing/ /' | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:unstable.list
 RUN curl -fsSL https://download.opensuse.org/repositories/devel:kubic:libcontainers:unstable/Debian_Testing/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/devel_kubic_libcontainers_unstable.gpg > /dev/null
@@ -74,23 +60,22 @@ RUN echo 'NAME="Calaos OS"\n\
     LOGO=archlinux-logo\n\
     ' > /usr/lib/os-release
 
-# COPY --from=quadlet-builder /opt /
-
 RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
 RUN chsh -s /bin/zsh
-# RUN mkdir -p /data/calaos/cache /data/calaos/config
-# RUN podman create --name calaos-server \
-#         --volume /data/calaos/cache:/root/.cache/calaos/ \
-#         --volume /data/calaos/config:/root/.config/calaos \
-#         -p 5454:5454/tcp \
-#         -p 4545:4545/udp \
-#         ghcr.io/calaos/calaos_docker/calaos_base:latest /opt/bin/calaos_server
-# RUN podman generate systemd -f --new --name calaos-server
-# RUN cp container-calaos-server.service /lib/systemd/system/
 
-# RUN podman create --name calaos-web-app \
-#         -p 80:3000/udp \
-#         ghcr.io/calaos/calaos_docker/calaos_base:latest /opt/bin/calaos_server
+RUN mkdir -p /etc/container/systemd
+COPY calaos-os/services/*.container /etc/containers/systemd/
 
-# RUN systemctl enable \
-#         container-calaos-server
+RUN mkdir -p /data/calaos/cache \
+    /data/calaos/config \
+    /data/haproxy \
+    /data/influxdb/data \
+    /data/influxdb/config \
+    /data/mosquitto/config
+
+# HA proxy config
+COPY calaos-os/config/haproxy.cfg /data/haproxy/
+COPY calaos-os/config/haproxy_gencert.sh /usr/sbin/haproxy_gencert.sh
+
+# Mosquitto config
+COPY calaos-os/config/mosquitto.conf /data/mosquitto/config
