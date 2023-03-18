@@ -92,14 +92,16 @@ EOF
 #copy kernel/initramfs to EFI partition to let sd-boot find it
 cp $rootfs_mnt/vmlinuz $rootfs_mnt/initrd.img $efi_mnt/
 
-# info "--> Install Syslinux"
-# mkdir -p $rootfs_mnt/boot/syslinux
-# cp /usr/lib/syslinux/bios/*.c32 $rootfs_mnt/boot/syslinux/
-# extlinux --install $rootfs_mnt/boot/syslinux
-# dd bs=440 count=1 conv=notrunc if=/usr/lib/syslinux/bios/mbr.bin of=$disk
-# cp /src/calaos-os/boot/syslinux.calaos.cfg $rootfs_mnt/boot/syslinux/syslinux.cfg
-# sed -i "s/\$uuid_rootfs/$uuid_rootfs/g" $rootfs_mnt/boot/syslinux/syslinux.cfg
-# cp /src/calaos-os/boot/splash.lss $rootfs_mnt/boot/syslinux/
+
+echo target arch : $TARGET_ARCH
+info "--> Install Syslinux"
+mkdir -p $rootfs_mnt/boot/syslinux
+cp /usr/lib/syslinux/modules/bios/*.c32 $rootfs_mnt/boot/syslinux/
+extlinux --install $rootfs_mnt/boot/syslinux
+dd bs=440 count=1 conv=notrunc if=/usr/lib/syslinux/mbr/mbr.bin of=$disk
+cp /src/calaos-os/boot/syslinux.calaos.cfg $rootfs_mnt/boot/syslinux/syslinux.cfg
+sed -i "s/\$uuid_rootfs/$uuid_rootfs/g" $rootfs_mnt/boot/syslinux/syslinux.cfg
+cp /src/calaos-os/boot/splash.lss $rootfs_mnt/boot/syslinux/
 
 info "--> Umount disks"
 umount $efi_mnt

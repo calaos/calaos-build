@@ -98,6 +98,9 @@ run-amd64:
 		-bios /usr/share/ovmf/OVMF.fd \
 		-nic user,hostfwd=tcp::2222-:22
 
+run-bios:
+	kvm -m 1024 -hda out/calaos-os.hddimg -hdb out/internal.hdd -net nic,model=virtio -net user -nic user,hostfwd=tcp::2222-:22
+
 run-arm64:
 		scripts/launch_arm64.sh
 run-rpi64:
