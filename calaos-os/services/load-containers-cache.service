@@ -1,0 +1,12 @@
+[Unit]
+Description=Load containers at first run
+ConditionPathExists=/var/lib/cache/containers
+Before=network.service
+
+[Service]
+ExecStart=/usr/sbin/load_containers.cache.sh
+Type=simple
+User=root
+
+[Install]
+WantedBy=multi-user.target
