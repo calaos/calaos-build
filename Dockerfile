@@ -1,8 +1,8 @@
 FROM debian:stable
 
-ARG UID=1001
-ARG GID=1001
-ARG USER=build
+ARG USER_UID=1001
+ARG USER_GID=1001
+ARG USER_NAME=build
 
 RUN echo 'deb http://deb.debian.org/debian bullseye-backports main contrib non-free' >> /etc/apt/sources.list
 
@@ -13,14 +13,14 @@ RUN apt -y update && \
         qemu-system-aarch64 qemu-system-x86 fdisk udev dosfstools qemu-efi qemu-efi-aarch64 ovmf \
         systemd-boot skopeo podman
 
-RUN addgroup --gid ${GID} docker
-RUN useradd -d /home/${USER} -r -u ${UID} -g ${GID} ${USER}
-RUN mkdir -p -m 0755 /home/${USER}
-RUN chown ${USER} /home/${USER}
+RUN addgroup --gid ${USER_GID} docker
+RUN useradd -d /home/${USER_NAME} -r -u ${USER_UID} -g ${USER_GID} ${USER_NAME}
+RUN mkdir -p -m 0755 /home/${USER_NAME}
+RUN chown ${USER_NAME} /home/${USER_NAME}
 
-RUN echo "${USER} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+RUN echo "${USER_NAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
-USER ${USER}
+USER ${USER_NAME}
 
 # Define entry point
 WORKDIR /src

@@ -62,7 +62,10 @@ pkgbuilds-init: docker-init
 
 docker-init: Dockerfile
 	@$(call print_green,"Building docker image")
-	@docker build --platform linux/${BUILDARCH} --no-cache=$(_NOCACHE) -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) -f Dockerfile .
+	@docker build --platform linux/${BUILDARCH} --no-cache=$(_NOCACHE) -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) \
+		--build-arg="USER_UID=$(shell id -u)" \
+        --build-arg="USER_GID=$(shell id -g)" \
+		-f Dockerfile .
 
 docker-shell: pkgbuilds-init
 	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /bin/bash
