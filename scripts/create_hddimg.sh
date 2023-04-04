@@ -59,6 +59,14 @@ rm -f $rootfs_mnt/.dockerenv
 #setup hostname. It does not work from within docker
 echo "calaos-os" > $rootfs_mnt/etc/hostname
 
+#Setup resolv.conf
+rm -rf $rootfs_mnt/etc/resolv.conf
+ln -sf /run/systemd/resolve/stub-resolv.conf $rootfs_mnt/etc/resolv.conf
+
+#Populate containers cache
+mkdir -p $rootfs_mnt/var/lib/cache/containers
+cp -r $outdir/containers/ $rootfs_mnt/var/lib/cache/containers
+
 #create a file to know we are booting a live image
 touch $rootfs_mnt/.calaos-live
 
@@ -97,7 +105,7 @@ echo target arch : $TARGET_ARCH
 info "--> Install Syslinux"
 mkdir -p $rootfs_mnt/boot/syslinux
 cp /usr/lib/syslinux/modules/bios/*.c32 $rootfs_mnt/boot/syslinux/
-extlinux --install $rootfs_mnt/boot/syslinux
+#extlinux --install $rootfs_mnt/boot/syslinux
 dd bs=440 count=1 conv=notrunc if=/usr/lib/syslinux/mbr/mbr.bin of=$disk
 cp /src/calaos-os/boot/syslinux.calaos.cfg $rootfs_mnt/boot/syslinux/syslinux.cfg
 sed -i "s/\$uuid_rootfs/$uuid_rootfs/g" $rootfs_mnt/boot/syslinux/syslinux.cfg
