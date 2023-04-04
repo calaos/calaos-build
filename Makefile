@@ -78,8 +78,10 @@ docker-calaos-os-init: Dockerfile.$(TARGET_ARCH).calaos-os
 	docker build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.calaos-os .
 	docker build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.$(MACHINE).calaos-os .
 
+cache-image:
+	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /src/scripts/cache_images.sh
 
-calaos-os: docker-init docker-calaos-os-init
+calaos-os: docker-init docker-calaos-os-init cache-image
 	@mkdir -p out
 	@$(call print_green,"Export rootfs from docker")
 	# skopeo copy docker-daemon:calaos-os:latest oci:out/calaos-os:latest 
