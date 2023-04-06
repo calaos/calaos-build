@@ -11,7 +11,7 @@ RUN apt -y update && \
     apt-get install -yq --no-install-recommends ca-certificates wget curl gnupg \
     openssh-server sudo systemd systemd-container systemd-timesyncd systemd-resolved bash htop \
     iproute2 ifupdown2 bridge-utils ethtool  net-tools  iputils-ping libgpgme11 libyajl2 \
-    zsh nano git skopeo fuse-overlayfs jq btrfs-progs rsync grub-efi
+    fish nano git skopeo fuse-overlayfs jq btrfs-progs rsync grub-efi
 
 RUN echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/unstable/Debian_Testing/ /' | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:unstable.list
 RUN curl -fsSL https://download.opensuse.org/repositories/devel:kubic:libcontainers:unstable/Debian_Testing/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/devel_kubic_libcontainers_unstable.gpg > /dev/null
@@ -23,7 +23,7 @@ RUN ln -sf /usr/libexec/podman/quadlet /usr/lib/systemd/system-generators/quadle
 
 # Create user and its home
 RUN groupadd -g ${GID} calaos && \
-useradd -d /home/${USER} -r -u ${UID} -g ${GID} ${USER} -s /usr/bin/zsh && \
+useradd -d /home/${USER} -r -u ${UID} -g ${GID} ${USER} -s /usr/bin/fish && \
    usermod -G root ${USER} && \
    mkdir -p -m 0755 /home/${USER} && \
    chown ${USER} /home/${USER} && \
@@ -60,8 +60,7 @@ RUN echo 'NAME="Calaos OS"\n\
     LOGO=archlinux-logo\n\
     ' > /usr/lib/os-release
 
-RUN wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true
-RUN chsh -s /bin/zsh
+RUN chsh -s /usr/bin/fish
 
 RUN mkdir -p /etc/container/systemd
 COPY calaos-os/services/*.container /etc/containers/systemd/
@@ -86,5 +85,5 @@ COPY calaos-os/config/mosquitto.conf /data/mosquitto/config
 COPY calaos-os/services/load-containers-cache.service /usr/lib/systemd/system/
 COPY scripts/load_containers_cache.sh /usr/sbin
 
-RUN systemctl enable \
-        load-containers-cache
+# RUN systemctl enable \
+#         load-containers-cache
