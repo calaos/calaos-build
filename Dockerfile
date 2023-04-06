@@ -13,7 +13,7 @@ RUN apt -y update && \
         qemu-system-aarch64 qemu-system-x86 fdisk udev dosfstools qemu-efi qemu-efi-aarch64 ovmf \
         systemd-boot skopeo podman
 
-RUN addgroup --gid ${USER_GID} docker
+RUN groupadd -o -g ${USER_GID} -r docker
 RUN useradd -d /home/${USER_NAME} -r -u ${USER_UID} -g ${USER_GID} ${USER_NAME}
 RUN mkdir -p -m 0755 /home/${USER_NAME}
 RUN chown ${USER_NAME} /home/${USER_NAME}
