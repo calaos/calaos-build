@@ -1,6 +1,7 @@
 [Unit]
 Description=calaos-server container
 After=local-fs.target
+After=load-containers-cache.service
 
 [Container]
 ContainerName=calaos-server

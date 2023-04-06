@@ -1,6 +1,7 @@
 [Unit]
 Description=calaos-web-app container
-#After=calaos-server.service
+After=calaos-server.service
+After=load-containers-cache.service
 
 [Container]
 ContainerName=calaos-web-app
