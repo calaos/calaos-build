@@ -6,7 +6,7 @@ DOCKER_IMAGE_NAME = calaos-os-builder
 DOCKER_TAG ?= latest
 DOCKER_COMMAND = docker run --platform linux/${BUILDARCH} -t -v $(PWD):/src --rm -w /src --privileged=true
 
-print_green = /bin/echo -e "\x1b[32m$1\x1b[0m"
+print_green = @echo "\033[92m$1\033[0m"
 
 NOCACHE?=0
 
