@@ -1,5 +1,6 @@
 [Unit]
 Description=infludxb container
+After=load-containers-cache.service
 
 [Container]
 ContainerName=influxdb

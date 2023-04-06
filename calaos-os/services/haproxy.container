@@ -1,5 +1,6 @@
 [Unit]
 Description=haproxy container
+After=load-containers-cache.service
 
 [Container]
 ContainerName=haproxy
