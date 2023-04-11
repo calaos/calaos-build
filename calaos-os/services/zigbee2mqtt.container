@@ -1,0 +1,20 @@
+[Unit]
+Description=zigbee2mqtt container
+After=load-containers-cache.service
+Wants=load-containers-cache.service
+
+[Container]
+ContainerName=zigbee2mqtt
+Image=docker.io/koenkk/zigbee2mqtt:1.30.3
+PublishPort=8080:8080/tcp
+Timezone=local
+PodmanArgs=--log-driver journald
+Volume=/data/zigbee2mqtt/data:/app/data
+
+[Service]
+Restart=always
+ExecStartPre=/usr/sbin/load_containers_cache.sh zigbee2mqtt
+
+[Install]
+# Start by default on boot
+WantedBy=multi-user.target default.target

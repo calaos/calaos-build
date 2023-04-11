@@ -12,7 +12,7 @@ Volume=/data/mosquitto/config:/mosquitto/config/
 
 [Service]
 Restart=always
-ExecStartPre=-/usr/sbin/load_containers_cache.sh mosquitto
+ExecStartPre=/usr/sbin/load_containers_cache.sh mosquitto
 
 [Install]
 # Start by default on boot
