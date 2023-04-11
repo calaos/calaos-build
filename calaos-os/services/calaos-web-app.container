@@ -13,7 +13,7 @@ PodmanArgs=--log-driver journald
 
 [Service]
 Restart=always
-ExecStartPre=-/usr/sbin/load_containers_cache.sh calaos-web-app
+ExecStartPre=/usr/sbin/load_containers_cache.sh calaos-web-app
 
 [Install]
 # Start by default on boot

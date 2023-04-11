@@ -13,7 +13,7 @@ Volume=/data/influxdb/config:/etc/influxdb2
 [Service]
 Restart=always
 ExecStartPre=-/usr/bin/mkdir /data/influxdb/data
-ExecStartPre=-/usr/sbin/load_containers_cache.sh influxdb
+ExecStartPre=/usr/sbin/load_containers_cache.sh influxdb
 
 [Install]
 # Start by default on boot

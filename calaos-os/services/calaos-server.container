@@ -15,7 +15,7 @@ Timezone=local
 
 [Service]
 Restart=always
-ExecStartPre=-/usr/sbin/load_containers_cache.sh calaos-server
+ExecStartPre=/usr/sbin/load_containers_cache.sh calaos-server
 
 [Install]
 # Start by default on boot
