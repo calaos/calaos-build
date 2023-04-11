@@ -13,8 +13,10 @@ disk=$outdir/calaos-os.hddimg
 # cp varstore.img efi.img $outdir
 
 qemu-system-aarch64 -M virt \
-    -machine virtualization=true -machine virt,gic-version=3  \
-    -cpu max -smp 2 -m 4096 \
+    -accel hvf \
+    -cpu host \
+     -smp 4,cores=4 \
+     -m 4096 \
     -drive if=pflash,format=raw,file=efi.img,readonly \
     -drive if=pflash,format=raw,file=varstore.img\
     -device virtio-blk-device,drive=disk1 \
