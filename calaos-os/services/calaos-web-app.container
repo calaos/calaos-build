@@ -1,18 +1,19 @@
 [Unit]
 Description=calaos-web-app container
 After=calaos-server.service
-After=load-containers-cache.service
 
 [Container]
 ContainerName=calaos-web-app
 Image=ghcr.io/calaos/calaos-web-app:latest
+
+
 PublishPort=3000:80/tcp
 Timezone=local
 PodmanArgs=--log-driver journald
-Network=host
 
 [Service]
 Restart=always
+ExecStartPre=-/usr/sbin/load_containers_cache.sh calaos-web-app
 
 [Install]
 # Start by default on boot
