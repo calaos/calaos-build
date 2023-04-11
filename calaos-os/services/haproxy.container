@@ -1,6 +1,7 @@
 [Unit]
 Description=haproxy container
 After=load-containers-cache.service
+Wants=load-containers-cache.service
 
 [Container]
 ContainerName=haproxy
@@ -16,7 +17,7 @@ Network=host
 [Service]
 Restart=always
 ExecStartPre=/usr/sbin/haproxy_gencert.sh
-
+ExecStartPre=-/usr/sbin/load_containers_cache.sh haproxy
 [Install]
 # Start by default on boot
 WantedBy=multi-user.target default.target

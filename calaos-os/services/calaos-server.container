@@ -1,7 +1,6 @@
 [Unit]
 Description=calaos-server container
 After=local-fs.target
-After=load-containers-cache.service
 
 [Container]
 ContainerName=calaos-server
@@ -13,10 +12,10 @@ Volume=/data/calaos/config:/root/.config/calaos
 Exec=/opt/bin/calaos_server
 #LogDriver=journald
 Timezone=local
-Network=host
 
 [Service]
 Restart=always
+ExecStartPre=-/usr/sbin/load_containers_cache.sh calaos-server
 
 [Install]
 # Start by default on boot

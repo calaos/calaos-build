@@ -1,6 +1,5 @@
 [Unit]
 Description=mosquitto container
-After=load-containers-cache.service
 
 [Container]
 ContainerName=mosquitto
@@ -10,10 +9,10 @@ PublishPort=9001:9001/tcp
 Timezone=local
 PodmanArgs=--log-driver journald
 Volume=/data/mosquitto/config:/mosquitto/config/
-Network=host
 
 [Service]
 Restart=always
+ExecStartPre=-/usr/sbin/load_containers_cache.sh mosquitto
 
 [Install]
 # Start by default on boot

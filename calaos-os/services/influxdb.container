@@ -1,6 +1,5 @@
 [Unit]
 Description=infludxb container
-After=load-containers-cache.service
 
 [Container]
 ContainerName=influxdb
@@ -10,11 +9,11 @@ Timezone=local
 PodmanArgs=--log-driver journald
 Volume=/data/influxdb/data:/var/lib/influxdb2
 Volume=/data/influxdb/config:/etc/influxdb2
-Network=host
 
 [Service]
 Restart=always
 ExecStartPre=-/usr/bin/mkdir /data/influxdb/data
+ExecStartPre=-/usr/sbin/load_containers_cache.sh influxdb
 
 [Install]
 # Start by default on boot
