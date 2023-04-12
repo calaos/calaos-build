@@ -13,6 +13,7 @@ Volume=/data/zigbee2mqtt/data:/app/data
 
 [Service]
 Restart=always
+ExecStartPre=-/usr/bin/mkdir /data/zigbee2mqtt/data
 ExecStartPre=/usr/sbin/load_containers_cache.sh zigbee2mqtt
 
 [Install]
