@@ -84,8 +84,4 @@ COPY calaos-os/config/haproxy_gencert.sh /usr/sbin/haproxy_gencert.sh
 COPY calaos-os/config/mosquitto.conf /data/mosquitto/config
 
 # Container cache
-COPY calaos-os/services/load-containers-cache.service /usr/lib/systemd/system/
 COPY scripts/load_containers_cache.sh /usr/sbin
-
-RUN systemctl enable \
-        load-containers-cache
