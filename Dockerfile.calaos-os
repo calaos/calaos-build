@@ -65,6 +65,7 @@ RUN echo 'eval "$(starship init bash)"' >> /root/.bashrc
 RUN echo 'eval "$(starship init bash)"' >> /home/${USER}/.bashrc
 
 RUN mkdir -p /etc/container/systemd
+COPY calaos-os/services/*.container /etc/containers/systemd/
 COPY calaos-os/services/calaos.network /etc/containers/systemd/
 
 RUN mkdir /tmp/images/
