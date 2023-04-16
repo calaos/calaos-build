@@ -1,0 +1,4 @@
+[Network]
+Subnet=192.168.81.0/24
+Gateway=192.168.81.1
+Label=app=calaos

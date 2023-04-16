@@ -9,6 +9,7 @@ PublishPort=9001:9001/tcp
 Timezone=local
 PodmanArgs=--log-driver journald
 Volume=/data/mosquitto/config:/mosquitto/config/
+Network=calaos.network
 
 [Service]
 Restart=always

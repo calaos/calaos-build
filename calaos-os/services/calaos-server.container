@@ -12,6 +12,7 @@ Volume=/data/calaos/config:/root/.config/calaos
 Exec=/opt/bin/calaos_server
 #LogDriver=journald
 Timezone=local
+Network=calaos.network
 
 [Service]
 Restart=always

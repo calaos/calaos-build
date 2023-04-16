@@ -10,6 +10,7 @@ PublishPort=8080:8080/tcp
 Timezone=local
 PodmanArgs=--log-driver journald
 Volume=/data/zigbee2mqtt/data:/app/data
+Network=calaos.network
 
 [Service]
 Restart=always
