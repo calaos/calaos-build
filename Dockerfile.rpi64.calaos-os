@@ -1,12 +1,15 @@
 FROM calaos-os:latest
 
 # Add raspberrypi official debian repos to apt sources list.
-RUN curl -sS https://archive.raspberrypi.org/debian/raspberrypi.gpg.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/spotify.gpg
+RUN curl -sS https://archive.raspberrypi.org/debian/raspberrypi.gpg.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/rpi.gpg
 RUN echo 'deb https://archive.raspberrypi.org/debian bullseye main contrib non-free' >> /etc/apt/sources.list
+
+COPY quirks/libfmt7_7.1.3+ds1-5_arm64.deb .
+RUN dpkg -i libfmt7_7.1.3+ds1-5_arm64.deb && rm -rf libfmt7_7.1.3+ds1-5_arm64.deb
 
 # Install rpi kernel, bootloader and utils dedicated to rpi
 RUN apt -y update && \
     apt -y upgrade && \
     apt-get install -yq --no-install-recommends \
         raspi-config raspi-utils raspberrypi-bootloader  \
-        raspberrypi-kernel raspberrypi-net-mods raspberrypi-sys-mods
+        raspberrypi-kernel raspberrypi-net-mods raspberrypi-sys-mods libfmt9 libkms++0

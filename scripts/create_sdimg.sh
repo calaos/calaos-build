@@ -63,6 +63,14 @@ mv $outdir/rootfs_mount/boot/* $boot_mnt/
 #setup hostname. It does not work from within docker
 echo "calaos-os" > $rootfs_mnt/etc/hostname
 
+#Setup resolv.conf
+rm -rf $rootfs_mnt/etc/resolv.conf
+ln -sf /run/systemd/resolve/stub-resolv.conf $rootfs_mnt/etc/resolv.conf
+
+#Populate containers cache
+mkdir -p $rootfs_mnt/var/lib/cache/containers
+cp -r $outdir/containers/ $rootfs_mnt/var/lib/cache/
+
 #create a file to know we are booting a live image
 touch $rootfs_mnt/.calaos-live
 
