@@ -82,7 +82,10 @@ docker-calaos-os-init: Dockerfile.$(TARGET_ARCH).calaos-os
 	docker build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.$(MACHINE).calaos-os .
 
 cache-image:
-	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /src/scripts/cache_images.sh
+	@$(DOCKER_COMMAND) -it \
+		-v /var/lib/containers:/var/lib/containers \
+		$(DOCKER_IMAGE_NAME):$(DOCKER_TAG) \
+		/src/scripts/cache_images.sh
 
 calaos-os: docker-init docker-calaos-os-init cache-image
 	@mkdir -p out
@@ -98,16 +101,24 @@ else
 	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_hddimg.sh
 endif
 
-run-amd64:
-	kvm -m 1024 -hda out/calaos-os.hddimg -hdb out/internal.hdd \
+run-amd64: out/internal.hdd
+	kvm -m 1024 \
+	 	-drive file=out/calaos-os.hddimg,format=raw \
+		-drive file=out/internal.hdd,format=raw \
 		-bios /usr/share/ovmf/OVMF.fd \
 		-nic user,hostfwd=tcp::2222-:22
 
-run-bios:
-	kvm -m 1024 -hda out/calaos-os.hddimg -hdb out/internal.hdd -net nic,model=virtio -net user -nic user,hostfwd=tcp::2222-:22
+run-bios: out/internal.hdd
+	kvm -m 1024 \
+		-drive file=out/calaos-os.hddimg,format=raw \
+		-drive file=out/internal.hdd,format=raw \
+		-net nic,model=virtio -net user -nic user,hostfwd=tcp::2222-:22
 
 run-arm64:
 		scripts/launch_arm64.sh
 run-rpi64:
 	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) \
 		sudo /src/scripts/launch_rpi.sh
+
+out/internal.hdd:
+	@truncate -s 10G out/internal.hdd
