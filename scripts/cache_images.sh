@@ -11,6 +11,6 @@ for f in /src/calaos-os/services/*.container ; do
         # Pull image
         sudo podman pull "$image"
         # Save image as oci-dir and compressed it
-        sudo podman save --compress --format oci-dir -o /src/out/containers/"$filename" "$image"
+        sudo podman save --format oci-dir -o /src/out/containers/"$filename" "$image"
     fi
 done
