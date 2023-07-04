@@ -2,7 +2,6 @@
 set -e
 
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-source $SCRIPTDIR/commom.sh
 
 disk=$outdir/calaos-os.hddimg
 
