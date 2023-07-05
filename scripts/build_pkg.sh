@@ -28,7 +28,7 @@ echo "Building package for repo: $repo and arch: $arch"
 echo "Commit: $commit"
 echo "Package version: $pkgversion"
 
-setup_calaos_repo
+#setup_calaos_repo
 import_gpg_key
 
 cd $build_dir/pkgbuilds/$pkgname
