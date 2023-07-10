@@ -1,10 +1,24 @@
-#!/bin/bash
+#!/bin/sh
+set -e
 
-build() {
-    add_runscript
-}
+PREREQS=""
+case $1 in
+    prereqs) echo "${PREREQS}"; exit 0;;
+esac
 
-help() {
-    cat <<HELPEOF
-HELPEOF
-}
+. /usr/share/initramfs-tools/hook-functions
+
+##
+copy_exec /sbin/sfdisk /sbin
+copy_exec /usr/bin/growpart /sbin
+copy_exec /bin/udevadm /sbin
+copy_exec /usr/bin/flock /bin
+copy_exec /bin/readlink /bin
+copy_exec /usr/sbin/resize2fs /sbin
+copy_exec /usr/sbin/e2fsck /sbin
+copy_exec /bin/sed /bin
+copy_exec /bin/rm /bin
+copy_exec /bin/awk /bin
+copy_exec /bin/grep /bin
+
+# vi: ts=4 noexpandtab

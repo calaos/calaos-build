@@ -49,6 +49,9 @@ all:
 	@ echo "  make build-|calaos-ddns|calaos-home|calaos-server|calaos-web-app|knxd|linuxconsoletools|ola|owfs # Build Arch package"
 	@ echo "  make run                      # Run ISO through qemu, for testing purppose"
 	@ echo
+	@ echo "  make cache-images             # Export all containers images to cache"
+	@ echo "  make delete-cache-images      # Remove all cached images"
+	@ echo
 	@$(call print_green,"Variables values    :")
 	@$(call print_green,"=====================")
 	@$(call print_green,"example : make calaos-os NOCACHE=0")
@@ -81,13 +84,19 @@ docker-calaos-os-init: Dockerfile.$(TARGET_ARCH).calaos-os
 	docker build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.calaos-os .
 	docker build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.$(MACHINE).calaos-os .
 
-cache-image:
+cache-images:
 	@$(DOCKER_COMMAND) -it \
 		-v /var/lib/containers:/var/lib/containers \
 		$(DOCKER_IMAGE_NAME):$(DOCKER_TAG) \
 		/src/scripts/cache_images.sh
 
-calaos-os: docker-init docker-calaos-os-init cache-image
+delete-cache-images:
+	@$(DOCKER_COMMAND) -it \
+		-v /var/lib/containers:/var/lib/containers \
+		$(DOCKER_IMAGE_NAME):$(DOCKER_TAG) \
+		sudo rm -fr /src/out/containers
+
+calaos-os: docker-init docker-calaos-os-init cache-images
 	@mkdir -p out
 	@$(call print_green,"Export rootfs from docker")
 	# skopeo copy docker-daemon:calaos-os:latest oci:out/calaos-os:latest 

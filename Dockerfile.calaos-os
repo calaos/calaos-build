@@ -11,7 +11,8 @@ RUN apt -y update && \
     apt-get install -yq --no-install-recommends ca-certificates wget curl gnupg \
     openssh-server sudo systemd systemd-container systemd-timesyncd systemd-resolved bash htop \
     iproute2 ifupdown2 bridge-utils ethtool  net-tools  iputils-ping libgpgme11 libyajl2 \
-    nano git skopeo fuse-overlayfs jq btrfs-progs rsync grub-efi zstd less
+    nano git skopeo fuse-overlayfs jq btrfs-progs rsync grub-efi zstd less \
+    e2fsprogs cloud-guest-utils util-linux
 
 RUN echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/unstable/Debian_Testing/ /' | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:unstable.list
 RUN curl -fsSL https://download.opensuse.org/repositories/devel:kubic:libcontainers:unstable/Debian_Testing/Release.key | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/devel_kubic_libcontainers_unstable.gpg > /dev/null
@@ -86,3 +87,10 @@ COPY calaos-os/config/mosquitto.conf /data/mosquitto/config
 
 # Container cache
 COPY scripts/load_containers_cache.sh /usr/sbin
+
+# Initramfs hook to resize rootfs
+RUN mkdir -p /usr/share/initramfs-tools/scripts/local-bottom
+COPY calaos-os/initramfs/hook_install_calaos /usr/share/initramfs-tools/hooks/resizeroot
+COPY calaos-os/initramfs/hook_run_calaos /usr/share/initramfs-tools/scripts/local-bottom/resizeroot
+#enable the resize
+RUN touch /etc/calaos-resize
