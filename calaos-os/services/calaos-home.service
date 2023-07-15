@@ -1,0 +1,13 @@
+[Unit]
+Description=Calaos home automation touchscreen UI
+After=xserver-nodm.service
+
+[Service]
+ExecStart=/usr/bin/x11docker --backend=podman --gpu --xc ghcr.io/calaos/calaos_home /usr/bin/start.sh
+Restart=always
+RestartSec=2
+Type=simple
+User=root
+
+[Install]
+WantedBy=multi-user.target
