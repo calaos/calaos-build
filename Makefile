@@ -124,7 +124,9 @@ run-bios: out/internal.hdd
 		-net nic,model=virtio -net user -nic user,hostfwd=tcp::2222-:22
 
 run-arm64:
-		scripts/launch_arm64.sh
+	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) scripts/pre_arm64_launch.sh
+	scripts/launch_arm64.sh
+
 run-rpi64:
 	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) \
 		sudo /src/scripts/launch_rpi.sh
