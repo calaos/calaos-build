@@ -1,13 +1,31 @@
 [Unit]
 Description=Calaos home automation touchscreen UI
-After=xserver-nodm.service
+After=local-fs.target
+Requires=network.target
+After=network.target
 
 [Service]
-ExecStart=/usr/bin/x11docker --backend=podman --gpu --xc ghcr.io/calaos/calaos_home /usr/bin/start.sh
+ExecStartPre=/usr/sbin/load_containers_cache.sh calaos-home ghcr.io/calaos/calaos_home:latest
+ExecStartPre=/usr/sbin/load_containers_cache.sh xserver ghcr.io/calaos/xserver:latest
+ExecStart=/usr/bin/x11docker --backend=podman --gpu --xc --desktop ghcr.io/calaos/calaos_home /usr/bin/start.sh
 Restart=always
 RestartSec=2
+KillMode=mixed
+SyslogIdentifier=%N
 Type=simple
 User=root
+
+TTYPath=/dev/tty8
+StandardInput=tty
+UnsetEnvironment=TERM
+
+UtmpIdentifier=tty8
+UtmpMode=user
+StandardOutput=journal
+#Wait 1s before starting X. Sometimes the dri driver is not fully loaded and Xorg start with a wrong resolution
+ExecStartPre=/usr/bin/sleep 1
+ExecStartPre=/bin/chvt 8
+PAMName=login
 
 [Install]
 WantedBy=multi-user.target
