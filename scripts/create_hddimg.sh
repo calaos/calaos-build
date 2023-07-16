@@ -5,6 +5,14 @@ set -e
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $SCRIPTDIR/calaos_lib.sh
 
+major=$(grep loop /proc/devices | cut -c3)
+for index in 0 1 2 3 4 5 6 7 8 9;
+do
+    if [ ! -e /dev/loop$index ]; then
+        mknod /dev/loop$index b $major $index
+    fi
+done
+
 cp -r /boot/ $outdir
 
 disk=$outdir/calaos-os.hddimg
