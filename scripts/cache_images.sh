@@ -31,6 +31,7 @@ for f in /src/calaos-os/services/*.container ; do
     podman_export "$filename" "$image"
 done
 
-#Add special image for calaos-home/x11
+#Cache images
+podman_export "calaos-base" "ghcr.io/calaos/calaos_base:latest"
 podman_export "calaos-home" "ghcr.io/calaos/calaos_home:latest"
 podman_export "xserver" "docker.io/x11docker/xserver:latest"
