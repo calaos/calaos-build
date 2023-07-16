@@ -16,8 +16,8 @@ qemu-system-aarch64 -M virt \
     -cpu host \
      -smp 4,cores=4 \
      -m 4096 \
-    -drive if=pflash,format=raw,file=efi.img,readonly \
-    -drive if=pflash,format=raw,file=varstore.img\
+    -drive if=pflash,format=raw,file=out/efi.img,readonly \
+    -drive if=pflash,format=raw,file=out/varstore.img\
     -device virtio-blk-device,drive=disk1 \
     -drive id=disk1,file=out/calaos-os.hddimg,if=none \
     -object rng-random,filename=/dev/urandom,id=rng0 \
