@@ -1,10 +1,10 @@
 REPO := calaos-dev
 COMMIT :=
 PKGVERSION :=
-
+CONTAINER_ENGINE ?= docker
 DOCKER_IMAGE_NAME = calaos-os-builder
 DOCKER_TAG ?= latest
-DOCKER_COMMAND = docker run --platform linux/${BUILDARCH} -t -v $(PWD):/src --rm -w /src --privileged=true
+DOCKER_COMMAND = $(CONTAINER_ENGINE) run --platform linux/${BUILDARCH} -t -v $(PWD):/src --rm -w /src --privileged=true
 
 print_green = @echo "\033[92m$1\033[0m"
 
@@ -65,7 +65,7 @@ pkgbuilds-init: docker-init
 
 docker-init: Dockerfile
 	@$(call print_green,"Building docker image")
-	@docker build --platform linux/${BUILDARCH} --no-cache=$(_NOCACHE) -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) \
+	@$(CONTAINER_ENGINE) build --platform linux/${BUILDARCH} --no-cache=$(_NOCACHE) -t $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) \
 		--build-arg="USER_UID=$(shell id -u)" \
         --build-arg="USER_GID=$(shell id -g)" \
 		-f Dockerfile .
@@ -74,18 +74,18 @@ docker-shell: pkgbuilds-init
 	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /bin/bash
 
 docker-rm:
-	@docker image rm $(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
+	@$(CONTAINER_ENGINE) image rm $(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
 
 build-%: pkgbuilds-init
 	@$(call print_green,"Building $* REPO=$(REPO) ARCH=$(BUILDARCH)")
 	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /src/scripts/build_pkg.sh "$*" "$(REPO)" "$(BUILDARCH)" "$(COMMIT)" "$(PKGVERSION)"
 
 docker-calaos-os-init: Dockerfile.$(TARGET_ARCH).calaos-os
-	docker build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.calaos-os .
-	docker build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.$(MACHINE).calaos-os .
+	$(CONTAINER_ENGINE) build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.calaos-os .
+	$(CONTAINER_ENGINE) build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.$(MACHINE).calaos-os .
 
 cache-images:
-	@$(DOCKER_COMMAND) -it \
+	$(DOCKER_COMMAND) -it \
 		-v /var/lib/containers:/var/lib/containers \
 		$(DOCKER_IMAGE_NAME):$(DOCKER_TAG) \
 		/src/scripts/cache_images.sh
@@ -103,11 +103,11 @@ calaos-os: docker-init docker-calaos-os-init cache-images
 	# rm -rf out/calaos-os.rootfs
 	# umoci unpack --rootless --image out/calaos-os out/calaos-os.rootfs
 	# cd out/calaos-os.rootfs/rootfs && tar cf ../../calaos-os.rootfs.tar .
-	@docker export $(shell docker create --platform linux/$(TARGET_ARCH) calaos-os:latest) --output="out/calaos-os.rootfs.tar"
+	@$(CONTAINER_ENGINE) export $(shell $(CONTAINER_ENGINE) create --platform linux/$(TARGET_ARCH) calaos-os:latest) --output="out/calaos-os.rootfs.tar"
 ifeq ($(MACHINE), rpi64)
-	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_sdimg.sh
+	$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_sdimg.sh
 else
-	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_hddimg.sh
+	$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_hddimg.sh
 endif
 
 run-amd64: out/internal.hdd
