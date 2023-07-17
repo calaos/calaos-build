@@ -15,7 +15,7 @@ RUN apt -y update && \
     e2fsprogs cloud-guest-utils util-linux podman kbd
 
 RUN curl -fsSL https://deb.calaos.fr/calaos/calaos-container/archive.key | apt-key add - && \
-    echo 'deb https://deb.calaos.fr/calaos/calaos-container bookworm releases bookworm releases' | tee /etc/apt/sources.list.d/calaos.list && \
+    echo 'deb https://deb.calaos.fr/calaos/calaos-container bookworm releases' | tee /etc/apt/sources.list.d/calaos.list && \
     apt -y update && \
     apt-get install -yq --no-install-recommends calaos-container
 
