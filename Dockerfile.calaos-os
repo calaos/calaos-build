@@ -12,10 +12,10 @@ RUN apt -y update && \
     openssh-server sudo systemd systemd-container systemd-timesyncd systemd-resolved bash htop \
     iproute2 ifupdown2 bridge-utils ethtool  net-tools  iputils-ping libgpgme11 libyajl2 \
     nano git skopeo fuse-overlayfs jq btrfs-progs rsync grub-efi zstd less \
-    e2fsprogs cloud-guest-utils util-linux podman kbd
+    e2fsprogs cloud-guest-utils util-linux podman kbd gpg openssl
 
-RUN curl -fsSL https://deb.calaos.fr/calaos/calaos-container/archive.key | apt-key add  - && \
-    echo 'deb https://deb.calaos.fr/calaos/calaos-container bookworm releases' | tee /etc/apt/sources.list.d/calaos.list && \
+RUN curl -fsSL https://deb.calaos.fr/calaos/calaos-container/archive.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/calaos.gpg && \
+    echo 'deb [signed-by=/etc/apt/trusted.gpg.d/calaos.gpg] https://deb.calaos.fr/calaos/calaos-container bookworm releases' | tee /etc/apt/sources.list.d/calaos.list && \
     apt -y update && \
     apt-get install -yq --no-install-recommends calaos-container
 
