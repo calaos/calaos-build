@@ -36,3 +36,9 @@ podman_export "calaos-base" "ghcr.io/calaos/calaos_base:latest"
 podman_export "calaos-home" "ghcr.io/calaos/calaos_home:latest"
 #Add special image for calaos-home/x11
 podman_export "xserver" "docker.io/x11docker/xserver:latest"
+
+podman_export "haproxy" "docker.io/haproxy:2.8-alpine"
+podman_export "grafana" "docker.io/grafana/grafana-oss:8.2.6"
+podman_export "influxdb" "docker.io/influxdb:2.7.0-alpine"
+podman_export "mosquitto" "docker.io/eclipse-mosquitto:2.0.15"
+podman_export "zigbee2mqtt" "docker.io/koenkk/zigbee2mqtt:1.32.1"

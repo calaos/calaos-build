@@ -4,14 +4,13 @@ ENV TERM=xterm-color
 
 ARG UID=1001
 ARG GID=1001
-ARG USER=calaos
 
 RUN apt -y update && \
     apt -y upgrade && \
     apt-get install -yq --no-install-recommends ca-certificates wget curl gnupg \
     openssh-server sudo systemd systemd-container systemd-timesyncd systemd-resolved bash htop \
-    iproute2 ifupdown2 bridge-utils ethtool  net-tools  iputils-ping libgpgme11 libyajl2 \
-    nano git skopeo fuse-overlayfs jq btrfs-progs rsync grub-efi zstd less \
+    iproute2 ifupdown2 bridge-utils ethtool net-tools iputils-ping libgpgme11 libyajl2 \
+    nano git fuse-overlayfs jq btrfs-progs rsync grub-efi zstd less \
     e2fsprogs cloud-guest-utils util-linux podman kbd gpg openssl
 
 RUN curl -fsSL https://deb.calaos.fr/calaos/calaos-container/archive.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/calaos.gpg && \
@@ -19,25 +18,14 @@ RUN curl -fsSL https://deb.calaos.fr/calaos/calaos-container/archive.key | gpg -
     apt -y update && \
     apt-get install -yq --no-install-recommends calaos-container
 
-# Create user and its home
-RUN groupadd -g ${GID} calaos && \
-useradd -d /home/${USER} -r -u ${UID} -g ${GID} ${USER} -s /usr/bin/fish && \
-   usermod -G root ${USER} && \
-   mkdir -p -m 0755 /home/${USER} && \
-   chown ${USER} /home/${USER} && \
-   echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers && \
-   echo 'root:calaos' | chpasswd && \
-   echo 'calaos:calaos' | chpasswd
-
 COPY calaos-os/services/config.network /etc/systemd/network/config.network
+
+# Set default root password
+RUN echo 'root:calaos' | chpasswd
 
 RUN systemctl enable \
         systemd-networkd \
         ssh
-
-COPY calaos-os/services/*.service /lib/systemd/system/
-RUN ln -s /lib/systemd/system/calaos-server.service /etc/systemd/system/multi-user.target.wants/calaos-server.service && \
-    ln -s /lib/systemd/system/calaos-home.service /etc/systemd/system/multi-user.target.wants/calaos-home.service
 
 # Enable root login for SSH
 RUN sed -i 's/.*PermitRootLogin .*$/PermitRootLogin yes/g' /etc/ssh/sshd_config
@@ -63,30 +51,8 @@ RUN echo 'NAME="Calaos OS"\n\
 
 RUN curl -fsSL https://starship.rs/install.sh | sh -s -- -y
 RUN echo 'eval "$(starship init bash)"' >> /root/.bashrc
-RUN echo 'eval "$(starship init bash)"' >> /home/${USER}/.bashrc
-
-RUN mkdir -p /etc/container/systemd
-COPY calaos-os/services/*.container /etc/containers/systemd/
-COPY calaos-os/services/calaos.network /etc/containers/systemd/
 
 RUN mkdir /tmp/images/
-
-RUN mkdir -p /data/calaos/cache \
-    /data/calaos/config \
-    /data/haproxy \
-    /data/influxdb/data \
-    /data/influxdb/config \
-    /data/mosquitto/config
-
-# HA proxy config
-COPY calaos-os/config/haproxy.cfg /data/haproxy/
-COPY calaos-os/config/haproxy_gencert.sh /usr/sbin/haproxy_gencert.sh
-
-# Mosquitto config
-COPY calaos-os/config/mosquitto.conf /data/mosquitto/config
-
-# Container cache
-COPY scripts/load_containers_cache.sh /usr/sbin
 
 # Initramfs hook to resize rootfs
 RUN mkdir -p /usr/share/initramfs-tools/scripts/local-bottom
