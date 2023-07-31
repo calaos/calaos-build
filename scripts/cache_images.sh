@@ -32,7 +32,7 @@ for f in /src/calaos-os/services/*.container ; do
 done
 
 #Cache images
-podman_export "calaos-base" "ghcr.io/calaos/calaos_base:latest"
+podman_export "calaos-server" "ghcr.io/calaos/calaos_base:latest"
 podman_export "calaos-home" "ghcr.io/calaos/calaos_home:latest"
 #Add special image for calaos-home/x11
 podman_export "xserver" "docker.io/x11docker/xserver:latest"
