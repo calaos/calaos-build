@@ -4,4 +4,5 @@ FROM calaos-os:latest
 RUN apt -y update && \
     apt -y upgrade && \
     apt-get install -yq --no-install-recommends \
-    linux-image-amd64 syslinux extlinux
+    linux-image-amd64 syslinux extlinux \
+    firmware-linux
