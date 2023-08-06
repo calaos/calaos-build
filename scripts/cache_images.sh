@@ -34,8 +34,6 @@ done
 #Cache images
 podman_export "calaos-server" "ghcr.io/calaos/calaos_base:latest"
 podman_export "calaos-home" "ghcr.io/calaos/calaos_home:latest"
-#Add special image for calaos-home/x11
-podman_export "xserver" "docker.io/x11docker/xserver:latest"
 
 podman_export "haproxy" "docker.io/haproxy:2.8-alpine"
 podman_export "grafana" "docker.io/grafana/grafana-oss:8.2.6"
