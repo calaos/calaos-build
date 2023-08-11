@@ -78,6 +78,9 @@ cp -r $outdir/containers/ $rootfs_mnt/var/lib/cache/
 #create a file to know we are booting a live image
 touch $rootfs_mnt/.calaos-live
 
+#Remove policy file from docker, we don't want this in a real system
+rm $rootfs_mnt/usr/sbin/policy-rc.d
+
 info "--> Install systemd-boot on EFI"
 mkdir -p $efi_mnt/EFI $efi_mnt/loader/entries
 #Init machine-id for bootctl to work
