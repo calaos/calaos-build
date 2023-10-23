@@ -22,21 +22,10 @@ function podman_export()
 }
 
 echo "[*] Export container images in cache"
+wget https://releases.calaos.fr/v4/images -O releases.calaos.json
 
-# iterate on all container files
-for f in /src/calaos-os/services/*.container ; do
-    image=$(< "$f" grep Image= | cut -d= -f 2)
-    filename=$(< "$f" grep ContainerName= | cut -d= -f 2)
-
-    podman_export "$filename" "$image"
-done
-
-#Cache images
-podman_export "calaos-server" "ghcr.io/calaos/calaos_base:latest"
-podman_export "calaos-home" "ghcr.io/calaos/calaos_home:latest"
-
-podman_export "haproxy" "docker.io/haproxy:2.8-alpine"
-podman_export "grafana" "docker.io/grafana/grafana-oss:8.2.6"
-podman_export "influxdb" "docker.io/influxdb:2.7.0-alpine"
-podman_export "mosquitto" "docker.io/eclipse-mosquitto:2.0.15"
-podman_export "zigbee2mqtt" "docker.io/koenkk/zigbee2mqtt:1.32.1"
+jq -r '.images[] | [.name, .source, .version] | @tsv' releases.calaos.json |
+  while IFS=$'\t' read -r name source version; do
+    echo "  [*] Exporting container $name version $version"
+    podman_export $name  $source
+  done
