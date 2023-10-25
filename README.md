@@ -10,12 +10,10 @@ Available commands :
 ====================
 
   make                          # Print this help
-  make pkgbuilds-init           # Clone/Update pkgbuilds repository
   make docker-init              # Build docker image, also build after any changes in Dockerfile
   make docker-shell             # Run docker container and jump into
   make docker-rm                # Remove a previous build docker image
   make calaos-os                # Build Calaos OS hddimg for installation
-  make build-|calaos-ddns|calaos-home|calaos-server|calaos-web-app|knxd|linuxconsoletools|ola|owfs # Build Arch package
   make run                      # Run ISO through qemu, for testing purppose
 
 Variables values :

@@ -41,12 +41,10 @@ all:
 	@$(call print_green,"====================")	
 	@ echo
 	@ echo "  make                          # Print this help"
-	@ echo "  make pkgbuilds-init           # Clone/Update pkgbuilds repository"
 	@ echo "  make docker-init              # Build docker image, also build after any changes in Dockerfile"
 	@ echo "  make docker-shell             # Run docker container and jump into"
 	@ echo "  make docker-rm                # Remove a previous build docker image"
 	@ echo "  make calaos-os                # Build Calaos OS hddimg for installation"
-	@ echo "  make build-|calaos-ddns|calaos-home|calaos-server|calaos-web-app|knxd|linuxconsoletools|ola|owfs # Build Arch package"
 	@ echo "  make run                      # Run ISO through qemu, for testing purppose"
 	@ echo
 	@ echo "  make cache-images             # Export all containers images to cache"
@@ -58,10 +56,6 @@ all:
 	@ echo
 	@ echo "NOCACHE = ${NOCACHE}            # Set to 0 if you want to accelerate Docker image build by using cache. default value NOCACHE=1. "
 	@ echo
-
-pkgbuilds-init: docker-init
-	@$(call print_green,"Syncing pkgbuilds repo")
-	# @$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /src/scripts/get_pkgbuilds.sh
 
 docker-init: Dockerfile
 	@$(call print_green,"Building docker image")
@@ -75,10 +69,6 @@ docker-shell: pkgbuilds-init
 
 docker-rm:
 	@$(CONTAINER_ENGINE) image rm $(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
-
-build-%: pkgbuilds-init
-	@$(call print_green,"Building $* REPO=$(REPO) ARCH=$(BUILDARCH)")
-	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /src/scripts/build_pkg.sh "$*" "$(REPO)" "$(BUILDARCH)" "$(COMMIT)" "$(PKGVERSION)"
 
 docker-calaos-os-init: Dockerfile.$(TARGET_ARCH).calaos-os
 	$(CONTAINER_ENGINE) build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.calaos-os .
