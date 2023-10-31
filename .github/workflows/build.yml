@@ -12,7 +12,7 @@ jobs:
       matrix:
         platform:
           - amd64
-          - arm64
+          # - arm64
     steps:
       - name: Checkout
         uses: actions/checkout@v4
