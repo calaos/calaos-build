@@ -7,6 +7,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - amd64
+          - arm64
     steps:
       -
         name: Checkout
@@ -17,4 +23,4 @@ jobs:
       -
         name: Build calaos-os
         run: |
-          make calaos-os
+          make calaos-os TARGET_ARCH=${{ matrix.platform }}
