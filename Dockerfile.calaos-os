@@ -16,11 +16,11 @@ RUN apt -y update && \
     nano git fuse-overlayfs grub-efi zstd less htop \
     e2fsprogs cloud-guest-utils kbd gpg
 
-RUN curl -fsSL https://deb.calaos.fr/calaos/calaos-container/archive.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/calaos.gpg && \
-    echo 'deb [signed-by=/etc/apt/trusted.gpg.d/calaos.gpg] https://deb.calaos.fr/calaos/calaos-container bookworm releases' > /etc/apt/sources.list.d/calaos.list && \
-    echo 'deb [signed-by=/etc/apt/trusted.gpg.d/calaos.gpg] https://deb.calaos.fr/calaos/calaos_ddns bookworm releases' >> /etc/apt/sources.list.d/calaos.list && \
-    apt -y update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -yqq -o DPkg::Options::="--force-confnew" install calaos-container
+# RUN curl -fsSL https://deb.calaos.fr/calaos/calaos-container/archive.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/calaos.gpg && \
+#     echo 'deb [signed-by=/etc/apt/trusted.gpg.d/calaos.gpg] https://deb.calaos.fr/calaos/calaos-container bookworm releases' > /etc/apt/sources.list.d/calaos.list && \
+#     echo 'deb [signed-by=/etc/apt/trusted.gpg.d/calaos.gpg] https://deb.calaos.fr/calaos/calaos_ddns bookworm releases' >> /etc/apt/sources.list.d/calaos.list && \
+#     apt -y update && \
+#     DEBIAN_FRONTEND=noninteractive apt-get -yqq -o DPkg::Options::="--force-confnew" install calaos-container
 
 COPY calaos-os/services/config.network /etc/systemd/network/config.network
 
@@ -57,6 +57,9 @@ RUN curl -fsSL https://starship.rs/install.sh | sh -s -- -y
 RUN echo 'eval "$(starship init bash)"' >> /root/.bashrc
 
 RUN mkdir /tmp/images/
+
+# Download latest images
+RUN wget https://releases.calaos.fr/v4/images -O /etc/calaos-os.releases
 
 # Initramfs hook to resize rootfs
 RUN mkdir -p /usr/share/initramfs-tools/scripts/local-bottom
