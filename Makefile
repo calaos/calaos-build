@@ -64,7 +64,7 @@ docker-init: Dockerfile
         --build-arg="USER_GID=$(shell id -g)" \
 		-f Dockerfile .
 
-docker-shell: pkgbuilds-init
+docker-shell:
 	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) /bin/bash
 
 docker-rm:
@@ -75,13 +75,13 @@ docker-calaos-os-init: Dockerfile.$(TARGET_ARCH).calaos-os
 	$(CONTAINER_ENGINE) build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.$(MACHINE).calaos-os .
 
 cache-images:
-	$(DOCKER_COMMAND) -it \
+	$(DOCKER_COMMAND) \
 		-v /var/lib/containers:/var/lib/containers \
 		$(DOCKER_IMAGE_NAME):$(DOCKER_TAG) \
 		/src/scripts/cache_images.sh
 
 delete-cache-images:
-	@$(DOCKER_COMMAND) -it \
+	@$(DOCKER_COMMAND) \
 		-v /var/lib/containers:/var/lib/containers \
 		$(DOCKER_IMAGE_NAME):$(DOCKER_TAG) \
 		sudo rm -fr /src/out/containers
@@ -95,30 +95,30 @@ calaos-os: docker-init docker-calaos-os-init cache-images
 	# cd out/calaos-os.rootfs/rootfs && tar cf ../../calaos-os.rootfs.tar .
 	@$(CONTAINER_ENGINE) export $(shell $(CONTAINER_ENGINE) create --platform linux/$(TARGET_ARCH) calaos-os:latest) --output="out/calaos-os.rootfs.tar"
 ifeq ($(MACHINE), rpi64)
-	$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_sdimg.sh
+	$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_sdimg.sh
 else
-	$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_hddimg.sh
+	$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_hddimg.sh
 endif
 
 run-amd64: out/internal.hdd
-	kvm -m 1024 \
+	qemu-system-x86_64 -m 1024 \
 	 	-drive file=out/calaos-os.hddimg,format=raw \
 		-drive file=out/internal.hdd,format=raw \
-		-bios /usr/share/ovmf/OVMF.fd \
+		-bios OVMF.fd\
 		-nic user,hostfwd=tcp::2222-:22
 
 run-bios: out/internal.hdd
-	kvm -m 1024 \
+	qemu-system-x86_64  -m 1024 \
 		-drive file=out/calaos-os.hddimg,format=raw \
 		-drive file=out/internal.hdd,format=raw \
 		-net nic,model=virtio -net user -nic user,hostfwd=tcp::2222-:22
 
 run-arm64:
-	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) scripts/pre_arm64_launch.sh
+	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) scripts/pre_arm64_launch.sh
 	scripts/launch_arm64.sh
 
 run-rpi64:
-	@$(DOCKER_COMMAND) -it $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) \
+	@$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) \
 		sudo /src/scripts/launch_rpi.sh
 
 out/internal.hdd:
