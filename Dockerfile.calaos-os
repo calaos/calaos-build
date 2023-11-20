@@ -4,6 +4,7 @@ ENV TERM=xterm-color
 
 ARG UID=1001
 ARG GID=1001
+ARG VERSION
 
 #Enable all repo (non-free)
 RUN sed -i 's/^Components: main$/Components: main contrib non-free non-free-firmware/g' /etc/apt/sources.list.d/debian.sources
@@ -41,10 +42,13 @@ RUN echo "export EDITOR=nano \n\
     " > /etc/bash.bashrc
 
 # Set os-release
-RUN echo 'NAME="Calaos OS"\n\
+
+RUN echo 'NAME="Calaos OS '$VERSION'"\n\
     PRETTY_NAME="Calaos OS"\n\
-    ID=arch\n\
-    BUILD_ID=rolling\n\
+    VERSION="'$VERSION'"\n\
+    VERSION_ID="Calaos OS 4"\n\
+    ID=debian\n\
+    ID_LIKE=debian\n\
     ANSI_COLOR="38;2;23;147;209"\n\
     HOME_URL="https://calaos.fr"\n\
     DOCUMENTATION_URL="https://calaos.fr"\n\

@@ -5,6 +5,7 @@ CONTAINER_ENGINE ?= docker
 DOCKER_IMAGE_NAME = calaos-os-builder
 DOCKER_TAG ?= latest
 DOCKER_COMMAND = $(CONTAINER_ENGINE) run --platform linux/${BUILDARCH} -t -v $(PWD):/src --rm -w /src --privileged=true
+VERSION?=$(shell git describe --long --tags --always)
 
 print_green = @echo "\033[92m$1\033[0m"
 
@@ -71,7 +72,7 @@ docker-rm:
 	@$(CONTAINER_ENGINE) image rm $(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
 
 docker-calaos-os-init: Dockerfile.$(TARGET_ARCH).calaos-os
-	$(CONTAINER_ENGINE) build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.calaos-os .
+	$(CONTAINER_ENGINE) build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) --build-arg "VERSION=$(VERSION)" -t calaos-os:latest -f Dockerfile.calaos-os .
 	$(CONTAINER_ENGINE) build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.$(MACHINE).calaos-os .
 
 cache-images:
@@ -89,10 +90,6 @@ delete-cache-images:
 calaos-os: docker-init docker-calaos-os-init cache-images
 	@mkdir -p out
 	@$(call print_green,"Export rootfs from docker")
-	# skopeo copy docker-daemon:calaos-os:latest oci:out/calaos-os:latest 
-	# rm -rf out/calaos-os.rootfs
-	# umoci unpack --rootless --image out/calaos-os out/calaos-os.rootfs
-	# cd out/calaos-os.rootfs/rootfs && tar cf ../../calaos-os.rootfs.tar .
 	@$(CONTAINER_ENGINE) export $(shell $(CONTAINER_ENGINE) create --platform linux/$(TARGET_ARCH) calaos-os:latest) --output="out/calaos-os.rootfs.tar"
 ifeq ($(MACHINE), rpi64)
 	$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_sdimg.sh
