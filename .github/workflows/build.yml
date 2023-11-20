@@ -48,3 +48,13 @@ jobs:
       - name: Build calaos-os
         run: |
           make calaos-os TARGET_ARCH=${{ matrix.platform }} VERSION=${{ steps.getversion.outputs.release }}
+
+      - name: Create a Release
+        uses: meeDamian/github-release@2.0
+        with:
+          token: ${{ secrets.ACTION_DISPATCH }}
+          tag: ${{ steps.getversion.outputs.release }}
+          name: ${{ steps.getversion.outputs.release }}
+          prerelease: false
+          files: out/*.hddimg
+          gzip: false
