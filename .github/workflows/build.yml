@@ -53,7 +53,7 @@ jobs:
       - name: Create a Release
         uses: meeDamian/github-release@2.0
         with:
-          token: ${{ secrets.ACTION_DISPATCH }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ steps.getversion.outputs.release }}
           name: ${{ steps.getversion.outputs.release }}
           prerelease: false
