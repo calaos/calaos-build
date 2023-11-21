@@ -92,9 +92,9 @@ calaos-os: docker-init docker-calaos-os-init cache-images
 	@$(call print_green,"Export rootfs from docker")
 	@$(CONTAINER_ENGINE) export $(shell $(CONTAINER_ENGINE) create --platform linux/$(TARGET_ARCH) calaos-os:latest) --output="out/calaos-os.rootfs.tar"
 ifeq ($(MACHINE), rpi64)
-	$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_sdimg.sh
+	$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_sdimg.sh "${VERSION}"
 else
-	$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_hddimg.sh
+	$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_hddimg.sh "${VERSION}"
 endif
 
 run-amd64: out/internal.hdd

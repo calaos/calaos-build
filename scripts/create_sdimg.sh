@@ -2,14 +2,16 @@
 
 set -e
 
+version="$1"
+
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $SCRIPTDIR/calaos_lib.sh
 
 cp -r /boot/ $outdir
 
-disk=$outdir/calaos-os.sdimg
+disk=$outdir/calaos-os-${version}.sdimg
 
-info "--> Create empty calaos-os.sdimg"
+info "--> Create empty calaos-os-${version}.sdimg"
 rm -rf $disk
 truncate -s 4G $disk
 
@@ -80,4 +82,6 @@ umount $rootfs_mnt
 losetup --detach $efi_disk
 losetup --detach $rootfs_disk
 
-green "--> Calaos OS image is created: $outdir/calaos-os.sdimg"
+zstd -19 -T0 "$disk" -o "$disk".zst
+
+green "--> Calaos OS image is created: $outdir/calaos-os-${version}.sdimg"
