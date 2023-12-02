@@ -40,10 +40,20 @@ rootfs_start=$(fdisk -lu $disk | grep calaos-os.hddimg2 | awk '{ print $3 }')
 rootfs_end=$(fdisk -lu $disk | grep calaos-os.hddimg2 | awk '{ print $4 }')
 rootfs_disk=$(losetup --offset $((512 * rootfs_start)) --sizelimit $((512 * rootfs_end)) --show --find ${disk})
 
-info "--> Format EFI partition"
+echo "ESP partition:"
+echo "esp_start = $esp_start"
+echo "esp_end = $esp_end"
+echo "efi_disk = $efi_disk"
+echo ""
+echo "Root partition:"
+echo "rootfs_start = $rootfs_start"
+echo "rootfs_end = $rootfs_end"
+echo "rootfs_disk = $rootfs_disk"
+
+info "--> Format EFI partition $efi_disk"
 mkfs.vfat $efi_disk
 
-info "--> Format Rootfs partition"
+info "--> Format Rootfs partition $rootfs_disk"
 mkfs.ext4 $rootfs_disk
 
 uuid_rootfs=$(blkid -s UUID -o value ${rootfs_disk})
