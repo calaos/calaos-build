@@ -31,13 +31,13 @@ parted -s ${disk} set 2 boot on
 parted -s ${disk} print
 
 #find EFI partition layout and setup loop device
-esp_start=$(fdisk -lu $disk | grep calaos-os.hddimg1 | awk '{ print $2 }')
-esp_end=$(fdisk -lu $disk | grep calaos-os.hddimg1 | awk '{ print $3 }')
+esp_start=$(fdisk -lu $disk | grep '\.hddimg1' | awk '{ print $2 }')
+esp_end=$(fdisk -lu $disk | grep '\.hddimg1' | awk '{ print $3 }')
 efi_disk=$(losetup --offset $((512 * esp_start)) --sizelimit $((512 * esp_end)) --show --find ${disk})
 
 #find rootfs partition layout and setup loop device
-rootfs_start=$(fdisk -lu $disk | grep calaos-os.hddimg2 | awk '{ print $3 }')
-rootfs_end=$(fdisk -lu $disk | grep calaos-os.hddimg2 | awk '{ print $4 }')
+rootfs_start=$(fdisk -lu $disk | grep '\.hddimg2' | awk '{ print $3 }')
+rootfs_end=$(fdisk -lu $disk | grep '\.hddimg2' | awk '{ print $4 }')
 rootfs_disk=$(losetup --offset $((512 * rootfs_start)) --sizelimit $((512 * rootfs_end)) --show --find ${disk})
 
 echo "ESP partition:"
