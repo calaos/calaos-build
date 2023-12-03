@@ -57,5 +57,5 @@ jobs:
           tag: ${{ steps.getversion.outputs.release }}
           name: ${{ steps.getversion.outputs.release }}
           prerelease: false
-          files: out/*.hddimg
+          files: out/*.zst
           gzip: false
