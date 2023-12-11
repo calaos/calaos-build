@@ -15,7 +15,7 @@ function podman_export()
     # Pull image
     sudo podman pull "$image"
     # Save image as oci-dir and compressed it
-    sudo podman save --format oci-dir -o /src/out/containers/"$container_name" "$image"
+    sudo podman save --format oci-archive -o /src/out/containers/"$container_name".tar "$image"
   else
     echo " -> Image already exist: $container_name ($image)"
   fi
