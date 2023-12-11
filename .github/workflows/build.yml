@@ -48,6 +48,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ steps.calaos_version.outputs.version_bumped }}
           name: ${{ steps.calaos_version.outputs.version_bumped }}
-          prerelease: ${{ github.event.inputs.vincrement != "" }}
+          prerelease: ${{ github.event.inputs.vincrement != '' }}
           files: out/*.zst
           gzip: false
