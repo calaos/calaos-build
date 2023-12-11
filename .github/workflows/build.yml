@@ -28,34 +28,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Get tags
-        run: git fetch --tags origin
-      - name: Get last tag
-        uses: addnab/docker-run-action@v3
-        id: getversion
+
+      - name: Calaos Action Bump Version
+        id: calaos_version
+        uses: calaos/action-bump-version@1.0.1
         with:
-          image: ghcr.io/calaos/debian_deb_build_base
-          options: -v ${{ github.workspace }}:/work
-          run: |
-            git config --global --add safe.directory /work
-            last_tag=$(python3 /get_last_tag.py /work)
-            export release=$(pysemver bump ${{ github.event.inputs.vincrement || 'prerelease' }} ${last_tag})
-            echo Build version: $release
-            echo "::set-output name=release::$release"
+          version_fragment: ${{ github.event.inputs.vincrement || 'prerelease' }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Build calaos-os
         run: |
-          make calaos-os TARGET_ARCH=${{ matrix.platform }} VERSION=${{ steps.getversion.outputs.release }}
+          make calaos-os TARGET_ARCH=${{ matrix.platform }} VERSION=${{ steps.calaos_version.outputs.version_bumped }}
 
       - name: Create a Release
         uses: meeDamian/github-release@2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ steps.getversion.outputs.release }}
-          name: ${{ steps.getversion.outputs.release }}
-          prerelease: false
+          tag: ${{ steps.calaos_version.outputs.version_bumped }}
+          name: ${{ steps.calaos_version.outputs.version_bumped }}
+          prerelease: {{ github.event.inputs.vincrement != "" }}
           files: out/*.zst
           gzip: false
