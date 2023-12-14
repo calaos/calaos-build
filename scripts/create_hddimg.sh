@@ -141,6 +141,7 @@ losetup --detach $efi_disk
 losetup --detach $rootfs_disk
 
 info "--> Compressing image"
+rm -fr "$disk".zst
 zstd -19 -T0 "$disk" -o "$disk".zst
 
 green "--> Calaos OS image is created: \n\t$outdir/calaos-os-${version}.hddimg\n\t$outdir/calaos-os-${version}.hddimg.zst"

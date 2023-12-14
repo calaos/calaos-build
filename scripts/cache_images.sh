@@ -25,7 +25,7 @@ echo "[*] Export container images in cache"
 
 for file in /src/out/containers.list/*.source; do
   container_name=$(basename "$file" .source)
-  image=$(cat "$file")
+  source "$file"
   echo "  [*] Exporting container $container_name"
-  podman_export "$container_name" "$image"
+  podman_export "$container_name" "$IMAGE_SRC"
 done
