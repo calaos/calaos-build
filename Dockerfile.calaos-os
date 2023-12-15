@@ -63,6 +63,10 @@ RUN echo 'NAME="Calaos OS '$VERSION'"\n\
 RUN curl -fsSL https://starship.rs/install.sh | sh -s -- -y
 RUN echo 'eval "$(starship init bash)"' >> /root/.bashrc
 
+#Reset systemd (see: https://systemd.io/BUILDING_IMAGES/)
+RUN echo "uninitialized" > /etc/machine-id && \
+    rm -fr /var/lib/systemd/random-seed
+
 RUN mkdir /tmp/images/
 
 # Initramfs hook to resize rootfs
