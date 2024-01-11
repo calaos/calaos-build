@@ -15,7 +15,7 @@ RUN apt -y update && \
     openssh-server systemd systemd-container systemd-timesyncd systemd-resolved systemd-sysv \
     iproute2 bridge-utils ethtool net-tools iputils-ping libgpgme11 libyajl2 \
     nano git fuse-overlayfs grub-efi zstd less htop \
-    e2fsprogs cloud-guest-utils kbd gpg
+    e2fsprogs cloud-guest-utils kbd gpg pciutils
 
 RUN curl -fsSL https://deb.calaos.fr/calaos/calaos-container/archive.key | gpg --dearmor | tee /etc/apt/trusted.gpg.d/calaos.gpg && \
     echo 'deb [signed-by=/etc/apt/trusted.gpg.d/calaos.gpg] https://deb.calaos.fr/calaos/calaos-container bookworm releases' > /etc/apt/sources.list.d/calaos.list && \
@@ -71,10 +71,16 @@ RUN mkdir /tmp/images/
 
 # Initramfs hook to resize rootfs
 RUN mkdir -p /usr/share/initramfs-tools/scripts/local-bottom
-COPY calaos-os/initramfs/hook_install_calaos /usr/share/initramfs-tools/hooks/resizeroot
-COPY calaos-os/initramfs/hook_run_calaos /usr/share/initramfs-tools/scripts/local-bottom/resizeroot
+COPY calaos-os/initramfs/install_hook/grow_root /usr/share/initramfs-tools/hooks/resizeroot
+COPY calaos-os/initramfs/run_hook/grow_root /usr/share/initramfs-tools/scripts/local-bottom/resizeroot
 #enable the resize
 RUN touch /etc/calaos-resize
 
 #better bash history search with up/down arrows
 COPY calaos-os/config/inputrc /root/.inputrc
+
+#RUN mkdir -p /etc/systemd/logind.conf.d && \
+#    echo "[Login]\n\
+#    NAutoVTs=1\n\
+#    ReserveVT=1\n\
+#    " > /etc/systemd/logind.conf.d/calaos.conf

@@ -5,4 +5,4 @@ RUN apt -y update && \
     apt -y upgrade && \
     apt-get install -yq --no-install-recommends \
     linux-image-amd64 syslinux extlinux \
-    firmware-linux
+    firmware-linux dialog

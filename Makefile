@@ -103,7 +103,7 @@ run-amd64: out/internal.hdd
 	qemu-system-x86_64 -m 1024 \
 	 	-drive file=out/calaos-os.hddimg,format=raw \
 		-drive file=out/internal.hdd,format=raw \
-		-bios OVMF.fd\
+		-bios OVMF.fd \
 		-nic user,hostfwd=tcp::2222-:22
 
 run-bios: out/internal.hdd

@@ -107,7 +107,7 @@ rm -f $efi_mnt/loader/random-seed
 
 cat > $efi_mnt/loader/loader.conf << EOF
 default calaos.conf
-timeout 5
+timeout 30
 console-mode max
 editor yes
 random-seed-mode off
@@ -118,6 +118,13 @@ title   Boot USB Calaos v4 Live
 linux   /vmlinuz
 initrd  /initrd.img
 options LABEL=live-efi root=UUID=${uuid_rootfs} rootwait rw init=/lib/systemd/systemd
+EOF
+
+cat > $efi_mnt/loader/entries/calaos-install.conf << EOF
+title   Install Calaos OS to disk
+linux   /vmlinuz
+initrd  /initrd.img
+options LABEL=live-efi root=UUID=${uuid_rootfs} rootwait rw init=/lib/systemd/systemd calaos_install
 EOF
 
 #copy kernel/initramfs to EFI partition to let sd-boot find it
@@ -141,7 +148,7 @@ losetup --detach $efi_disk
 losetup --detach $rootfs_disk
 
 info "--> Compressing image"
-ln -sf "$disk" "$outdir/calaos-os.hddimg"
+(cd "$outdir"; ln -sf "$(basename $disk)" calaos-os.hddimg)
 
 rm -fr "$disk".zst
 zstd -19 -T0 "$disk" -o "$disk".zst
