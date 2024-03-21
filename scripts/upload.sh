@@ -37,4 +37,4 @@ else
     repo="stable"
 fi
 
-upload_file "$FILE" "$(shasum -a 256 "build/$FILE" | cut -d' ' -f1)" "${repo}/calaos-os/${TARGET_ARCH}/"
+upload_file "$FILE" "$(shasum -a 256 "$FILE" | cut -d' ' -f1)" "${repo}/calaos-os/${TARGET_ARCH}/"
