@@ -48,5 +48,7 @@ jobs:
           tag: ${{ steps.calaos_version.outputs.version_bumped }}
           name: ${{ steps.calaos_version.outputs.version_bumped }}
           prerelease: ${{ github.event.inputs.vincrement == '' || github.event.inputs.vincrement == 'prerelease' }}
-          files: out/*.zst
-          gzip: false
+
+      - name: Upload Release Asset
+        run: |
+          make upload TARGET_ARCH=${{ matrix.platform }} VERSION=${{ steps.calaos_version.outputs.version_bumped }} UPLOAD_KEY=${{ secrets.UPLOAD_KEY }}

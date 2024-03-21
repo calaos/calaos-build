@@ -122,3 +122,6 @@ run-rpi64:
 
 out/internal.hdd:
 	@truncate -s 10G out/internal.hdd
+
+upload:
+	@scripts/upload.sh $(TARGET_ARCH) out/calaos-os*.hddimg.zst

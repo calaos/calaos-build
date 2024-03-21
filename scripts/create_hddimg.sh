@@ -17,7 +17,7 @@ done
 
 cp -r /boot/ $outdir
 
-disk=$outdir/calaos-os-${version}.hddimg
+disk=$outdir/calaos-os-${TARGET_ARCH}-v${version}.hddimg
 
 info "--> Create empty calaos-os-${version}.hddimg"
 rm -rf $disk
@@ -153,4 +153,4 @@ info "--> Compressing image"
 rm -fr "$disk".zst
 zstd -19 -T0 "$disk" -o "$disk".zst
 
-green "--> Calaos OS image is created: \n\t$outdir/calaos-os-${version}.hddimg\n\t$outdir/calaos-os-${version}.hddimg.zst"
+green "--> Calaos OS image is created: \n\t$outdir/calaos-os-${TARGET_ARCH}-v${version}.hddimg\n\t$outdir/calaos-os-${TARGET_ARCH}-v${version}.hddimg.zst"
