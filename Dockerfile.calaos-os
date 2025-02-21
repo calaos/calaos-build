@@ -60,7 +60,7 @@ RUN echo 'NAME="Calaos OS '$VERSION'"\n\
     LOGO=debian-logo\n\
     ' > /usr/lib/os-release
 
-RUN env -u VERSION curl -fsSL https://starship.rs/install.sh | sh -s -- -y
+RUN curl -fsSL https://starship.rs/install.sh | env -u VERSION sh -s -- -y
 RUN echo 'eval "$(starship init bash)"' >> /root/.bashrc
 
 #Reset systemd (see: https://systemd.io/BUILDING_IMAGES/)
