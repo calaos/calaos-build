@@ -39,7 +39,7 @@ endif
 all:
 	$(info )
 	@$(call print_green,"Available commands :")
-	@$(call print_green,"====================")	
+	@$(call print_green,"====================")
 	@ echo
 	@ echo "  make                          # Print this help"
 	@ echo "  make docker-init              # Build docker image, also build after any changes in Dockerfile"
@@ -96,7 +96,7 @@ calaos-os: docker-init docker-calaos-os-init cache-images
 ifeq ($(MACHINE), rpi64)
 	$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_sdimg.sh "${VERSION}"
 else
-	$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_hddimg.sh "${VERSION}"
+	$(DOCKER_COMMAND) $(DOCKER_IMAGE_NAME):$(DOCKER_TAG) sudo /src/scripts/create_hddimg.sh "${VERSION}" "${TARGET_ARCH}"
 endif
 
 run-amd64: out/internal.hdd

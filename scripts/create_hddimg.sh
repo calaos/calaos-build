@@ -3,6 +3,7 @@
 set -e
 
 version="$1"
+target="${2:-$TARGET_ARCH}"
 
 SCRIPTDIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source $SCRIPTDIR/calaos_lib.sh
@@ -17,7 +18,7 @@ done
 
 cp -r /boot/ $outdir
 
-disk=$outdir/calaos-os-${TARGET_ARCH}-v${version}.hddimg
+disk=$outdir/calaos-os-${target}-v${version}.hddimg
 
 info "--> Create empty calaos-os-${version}.hddimg"
 rm -rf $disk
@@ -131,7 +132,7 @@ EOF
 cp $rootfs_mnt/vmlinuz $rootfs_mnt/initrd.img $efi_mnt/
 
 
-echo target arch : $TARGET_ARCH
+echo target arch : $target
 info "--> Install Syslinux"
 mkdir -p $rootfs_mnt/boot/syslinux
 cp /usr/lib/syslinux/modules/bios/*.c32 $rootfs_mnt/boot/syslinux/
@@ -153,4 +154,4 @@ info "--> Compressing image"
 rm -fr "$disk".zst
 zstd -19 -T0 "$disk" -o "$disk".zst
 
-green "--> Calaos OS image is created: \n\t$outdir/calaos-os-${TARGET_ARCH}-v${version}.hddimg\n\t$outdir/calaos-os-${TARGET_ARCH}-v${version}.hddimg.zst"
+green "--> Calaos OS image is created: \n\t$outdir/calaos-os-${target}-v${version}.hddimg\n\t$outdir/calaos-os-${target}-v${version}.hddimg.zst"
