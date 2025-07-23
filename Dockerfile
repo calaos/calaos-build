@@ -4,8 +4,6 @@ ARG USER_UID=1001
 ARG USER_GID=1001
 ARG USER_NAME=build
 
-RUN echo 'deb http://deb.debian.org/debian bullseye-backports main contrib non-free' >> /etc/apt/sources.list
-
 RUN apt -y update && \
     apt -y upgrade && \
     apt-get install -yq --no-install-recommends ca-certificates wget gnupg \
