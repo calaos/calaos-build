@@ -21,6 +21,7 @@ RUN curl -fsSL https://deb.calaos.fr/calaos/calaos-container/archive.key | gpg -
     echo 'deb [signed-by=/etc/apt/trusted.gpg.d/calaos.gpg] https://deb.calaos.fr/calaos/calaos-container bookworm releases' > /etc/apt/sources.list.d/calaos.list && \
     echo 'deb [signed-by=/etc/apt/trusted.gpg.d/calaos.gpg] https://deb.calaos.fr/calaos/calaos_ddns bookworm releases' >> /etc/apt/sources.list.d/calaos.list && \
     echo 'deb [signed-by=/etc/apt/trusted.gpg.d/calaos.gpg] https://deb.calaos.fr/calaos/pkgdebs bookworm releases' >> /etc/apt/sources.list.d/calaos.list && \
+    echo 'deb [signed-by=/etc/apt/trusted.gpg.d/calaos.gpg] https://deb.calaos.fr/calaos/calaos_remote_ui bookworm releases' >> /etc/apt/sources.list.d/calaos.list && \
     apt -y update && \
     touch /tmp/calaos-os.container.install && \
     DEBIAN_FRONTEND=noninteractive apt-get -yqq -o DPkg::Options::="--force-confnew" install calaos && \
