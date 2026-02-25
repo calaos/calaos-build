@@ -1,4 +1,4 @@
-FROM debian:stable
+FROM debian:bookworm-slim
 
 ARG USER_UID=1001
 ARG USER_GID=1001
