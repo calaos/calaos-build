@@ -13,7 +13,13 @@ function upload_file()
         -H "X-Upload-Folder: $INSTALLPATH" \
         -H "X-Upload-SHA256: $HASH" \
         -H "X-Upload-Filename: $(basename $FNAME)" \
-        --data-binary @$FNAME \
+        --upload-file "$FNAME" \
+        --tcp-nodelay \
+        --no-buffer \
+        --retry 3 \
+        --retry-delay 10 \
+        --max-time 7200 \
+        -w "\n\n✅ Upload done in %{time_total}s\nSpeed : %{speed_upload} bytes/s\nSize : %{size_upload} bytes\n" \
         https://calaos.fr/download/upload
 }
 
