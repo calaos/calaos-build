@@ -8,12 +8,12 @@ function upload_file()
     HASH=$2
     INSTALLPATH=$3
 
-    curl -X POST \
-        -H "Content-Type: multipart/form-data" \
-        -F "upload_key=$UPLOAD_KEY" \
-        -F "upload_folder=$INSTALLPATH" \
-        -F "upload_sha256=$HASH" \
-        -F "upload_file=@$FNAME" \
+    curl --http2 -X PUT \
+        -H "X-Upload-Key: $UPLOAD_KEY" \
+        -H "X-Upload-Folder: $INSTALLPATH" \
+        -H "X-Upload-SHA256: $HASH" \
+        -H "X-Upload-Filename: $(basename $FNAME)" \
+        --data-binary @$FNAME \
         https://calaos.fr/download/upload
 }
 
