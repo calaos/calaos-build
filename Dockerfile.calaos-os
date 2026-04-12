@@ -23,7 +23,7 @@ RUN curl -fsSL https://github.com/calaos/pkgdebs/releases/download/calaos-keyrin
     rm -f /tmp/calaos-keyring.deb && \
     apt -y update && \
     touch /tmp/calaos-os.container.install && \
-    DEBIAN_FRONTEND=noninteractive apt-get -yqq -o DPkg::Options::="--force-confnew" install calaos && \
+    DEBIAN_FRONTEND=noninteractive apt-get -yq -o DPkg::Options::="--force-confnew" install calaos 2>&1 | tee /tmp/install.log || (cat /tmp/install.log && exit 1) && \
     rm -rf /tmp/calaos-os.container.install
 
 COPY calaos-os/services/config.network /etc/systemd/network/config.network
