@@ -24,13 +24,13 @@ parted -s ${disk} set 2 boot on
 parted -s ${disk} print
 
 #find EFI partition layout and setup loop device
-esp_start=$(fdisk -lu $disk | grep calaos-os.sdimg1 | awk '{ print $2 }')
-esp_end=$(fdisk -lu $disk | grep calaos-os.sdimg1 | awk '{ print $3 }')
+esp_start=$(fdisk -lu $disk | grep '\.sdimg1' | awk '{ print $2 }')
+esp_end=$(fdisk -lu $disk | grep '\.sdimg1' | awk '{ print $3 }')
 efi_disk=$(losetup --offset $((512 * esp_start)) --sizelimit $((512 * esp_end)) --show --find ${disk})
 
 #find rootfs partition layout and setup loop device
-rootfs_start=$(fdisk -lu $disk | grep calaos-os.sdimg2 | awk '{ print $3 }')
-rootfs_end=$(fdisk -lu $disk | grep calaos-os.sdimg2 | awk '{ print $4 }')
+rootfs_start=$(fdisk -lu $disk | grep '\.sdimg2' | awk '{ print $3 }')
+rootfs_end=$(fdisk -lu $disk | grep '\.sdimg2' | awk '{ print $4 }')
 rootfs_disk=$(losetup --offset $((512 * rootfs_start)) --sizelimit $((512 * rootfs_end)) --show --find ${disk})
 
 info "--> Format EFI partition"
@@ -57,8 +57,7 @@ mount -t vfat $efi_disk $boot_mnt
 
 info "--> Extract rootfs"
 tar xf $outdir/calaos-os.rootfs.tar -C $rootfs_mnt
-#remove the docker file on rootfs
-rm -f $rootfs_mnt/.dockerenv
+remove_docker_leftovers $rootfs_mnt
 
 info "--> Move boot content"
 mv $outdir/rootfs_mount/boot/* $boot_mnt/
