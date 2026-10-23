@@ -156,6 +156,14 @@ upload_pkg()
     fi
 }
 
+#Usage: remove_docker_leftovers $rootfs_mnt
+#Debian's Docker policy-rc.d (exit 101) would block every service start
+#done by apt on the installed system.
+remove_docker_leftovers()
+{
+    rm -f "$1/.dockerenv" "$1/usr/sbin/policy-rc.d"
+}
+
 #Set permissions on docker mounted volume which belongs to root by default
 fix_docker_perms()
 {

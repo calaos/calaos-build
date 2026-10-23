@@ -57,8 +57,7 @@ mount -t vfat $efi_disk $boot_mnt
 
 info "--> Extract rootfs"
 tar xf $outdir/calaos-os.rootfs.tar -C $rootfs_mnt
-#remove the docker file on rootfs
-rm -f $rootfs_mnt/.dockerenv
+remove_docker_leftovers $rootfs_mnt
 
 info "--> Move boot content"
 mv $outdir/rootfs_mount/boot/* $boot_mnt/

@@ -74,8 +74,7 @@ mount -t vfat $efi_disk $efi_mnt
 
 info "--> Extract rootfs"
 tar xf $outdir/calaos-os.rootfs.tar -C $rootfs_mnt
-#remove the docker file on rootfs
-rm -f $rootfs_mnt/.dockerenv
+remove_docker_leftovers $rootfs_mnt
 
 #setup hostname. It does not work from within docker
 echo "calaos-os" > $rootfs_mnt/etc/hostname
@@ -90,9 +89,6 @@ cp -r $outdir/containers/ $rootfs_mnt/var/lib/cache/
 
 #create a file to know we are booting a live image
 touch $rootfs_mnt/.calaos-live
-
-#Remove policy file from docker, we don't want this in a real system
-rm $rootfs_mnt/usr/sbin/policy-rc.d
 
 info "--> Install systemd-boot on EFI"
 mkdir -p $efi_mnt/EFI $efi_mnt/loader/entries
