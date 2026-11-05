@@ -6,6 +6,10 @@ ARG UID=1001
 ARG GID=1001
 ARG VERSION
 
+# The base image ships force-unsafe-io (no fsync): after a power cut dpkg's
+# database says "installed" while the files are lost. Must go before any apt run.
+RUN rm -f /etc/dpkg/dpkg.cfg.d/docker-apt-speedup
+
 #Enable all repo (non-free)
 RUN sed -i 's/^Components: main$/Components: main contrib non-free non-free-firmware/g' /etc/apt/sources.list.d/debian.sources
 
