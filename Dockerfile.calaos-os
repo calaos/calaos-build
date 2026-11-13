@@ -4,7 +4,6 @@ ENV TERM=xterm-color
 
 ARG UID=1001
 ARG GID=1001
-ARG VERSION
 
 # The base image ships force-unsafe-io (no fsync): after a power cut dpkg's
 # database says "installed" while the files are lost. Must go before any apt run.
@@ -48,23 +47,19 @@ RUN echo "export EDITOR=nano \n\
     alias ll='ls -l' \n\
     " > /etc/bash.bashrc
 
-# Set os-release
+# Brand the Debian os-release but keep its VERSION, VERSION_ID and codename: they
+# describe the Debian base. The Calaos OS version comes from the `calaos` package.
+RUN sed -i \
+        -e 's/^NAME=.*/NAME="Calaos OS"/' \
+        -e 's/^PRETTY_NAME=.*/PRETTY_NAME="Calaos OS"/' \
+        -e 's|^HOME_URL=.*|HOME_URL="https://calaos.fr"|' \
+        -e 's|^SUPPORT_URL=.*|SUPPORT_URL="https://calaos.fr"|' \
+        -e 's|^BUG_REPORT_URL=.*|BUG_REPORT_URL="https://calaos.fr"|' \
+        /usr/lib/os-release && \
+    echo 'DOCUMENTATION_URL="https://calaos.fr"' >> /usr/lib/os-release && \
+    grep -E '^(NAME|PRETTY_NAME|VERSION_ID|ID)=' /usr/lib/os-release
 
-RUN echo 'NAME="Calaos OS '$VERSION'"\n\
-    PRETTY_NAME="Calaos OS"\n\
-    VERSION="'$VERSION'"\n\
-    VERSION_ID="Calaos OS 4"\n\
-    ID=debian\n\
-    ID_LIKE=debian\n\
-    ANSI_COLOR="38;2;23;147;209"\n\
-    HOME_URL="https://calaos.fr"\n\
-    DOCUMENTATION_URL="https://calaos.fr"\n\
-    SUPPORT_URL="https://calaos.fr"\n\
-    BUG_REPORT_URL="https://calaos.fr"\n\
-    LOGO=debian-logo\n\
-    ' > /usr/lib/os-release
-
-RUN curl -fsSL https://starship.rs/install.sh | env -u VERSION sh -s -- -y
+RUN curl -fsSL https://starship.rs/install.sh | sh -s -- -y
 RUN echo 'eval "$(starship init bash)"' >> /root/.bashrc
 
 #Reset systemd (see: https://systemd.io/BUILDING_IMAGES/)
