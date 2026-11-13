@@ -72,7 +72,7 @@ docker-rm:
 	@$(CONTAINER_ENGINE) image rm $(DOCKER_IMAGE_NAME):$(DOCKER_TAG)
 
 docker-calaos-os-init: Dockerfile.$(TARGET_ARCH).calaos-os
-	$(CONTAINER_ENGINE) build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) --build-arg "VERSION=$(VERSION)" -t calaos-os:latest -f Dockerfile.calaos-os .
+	$(CONTAINER_ENGINE) build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.calaos-os .
 	$(CONTAINER_ENGINE) build --platform linux/$(TARGET_ARCH) --no-cache=$(_NOCACHE) -t calaos-os:latest -f Dockerfile.$(MACHINE).calaos-os .
 	@mkdir -p out/containers.list
 	$(DOCKER_COMMAND) calaos-os:latest /src/scripts/export_image_names.sh
