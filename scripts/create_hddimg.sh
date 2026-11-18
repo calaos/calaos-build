@@ -136,7 +136,8 @@ echo target arch : $target
 info "--> Install Syslinux"
 mkdir -p $rootfs_mnt/boot/syslinux
 cp /usr/lib/syslinux/modules/bios/*.c32 $rootfs_mnt/boot/syslinux/
-#extlinux --install $rootfs_mnt/boot/syslinux
+# Volume boot record of the rootfs partition: mbr.bin chains to it on the active partition.
+extlinux --install $rootfs_mnt/boot/syslinux
 dd bs=440 count=1 conv=notrunc if=/usr/lib/syslinux/mbr/mbr.bin of=$disk
 cp /src/calaos-os/boot/syslinux.calaos.cfg $rootfs_mnt/boot/syslinux/syslinux.cfg
 sed -i "s/\$uuid_rootfs/$uuid_rootfs/g" $rootfs_mnt/boot/syslinux/syslinux.cfg

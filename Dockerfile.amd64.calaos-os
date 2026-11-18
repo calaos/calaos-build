@@ -1,8 +1,9 @@
 FROM calaos-os:latest
 
-# Install x86_64 kernel
+# grub-pc-bin only adds the i386-pc modules that calaos_install needs for a BIOS
+# install; grub-pc itself would replace grub-efi-amd64.
 RUN apt -y update && \
     apt -y upgrade && \
     apt-get install -yq --no-install-recommends \
-    linux-image-amd64 syslinux extlinux \
+    linux-image-amd64 syslinux extlinux grub-pc-bin \
     firmware-linux dialog
