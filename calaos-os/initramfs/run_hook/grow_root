@@ -68,7 +68,7 @@ umount "${rootmnt}" ||
 # This is to avoid any other processes using the block device that the
 # root partition is on, which would cause the sfdisk 'BLKRRPART' to fail.
 udevadm settle --timeout ${ROOTDELAY:-30} ||
-	error "GROWROOT: WARNING: udevadm settle prior to growpart failed"
+	msg "WARNING: udevadm settle prior to growpart failed"
 
 if out=$(growpart "${rootdisk}" "${partnum}" 2>&1); then
 	case "$out" in
