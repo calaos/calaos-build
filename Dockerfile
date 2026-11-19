@@ -7,7 +7,7 @@ ARG USER_NAME=build
 RUN apt -y update && \
     apt -y upgrade && \
     apt-get install -yq --no-install-recommends ca-certificates wget gnupg \
-        git fakeroot build-essential sudo nano mtools syslinux-common syslinux-efi parted \
+        git fakeroot build-essential sudo nano mtools syslinux-common syslinux-efi extlinux parted \
         qemu-system-aarch64 qemu-system-x86 fdisk udev dosfstools qemu-efi qemu-efi-aarch64 ovmf \
         systemd-boot skopeo podman netavark jq zstd
 
