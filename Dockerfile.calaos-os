@@ -78,8 +78,3 @@ RUN touch /etc/calaos-resize
 #better bash history search with up/down arrows
 COPY calaos-os/config/inputrc /root/.inputrc
 
-#RUN mkdir -p /etc/systemd/logind.conf.d && \
-#    echo "[Login]\n\
-#    NAutoVTs=1\n\
-#    ReserveVT=1\n\
-#    " > /etc/systemd/logind.conf.d/calaos.conf

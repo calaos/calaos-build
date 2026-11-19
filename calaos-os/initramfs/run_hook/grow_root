@@ -13,10 +13,9 @@ esac
 msg() { echo "GROWROOT:" "$@" ; }
 fail() { [ $# -eq 0 ] || msg "$@"; exit 1; }
 
-# do nothing if already resized
-if [ ! -f /etc/calaos-resize ]; then
-	[ -f "${rootmnt}$f" ] && exit 0
-fi
+# The marker lives in the root filesystem (touched in Dockerfile.calaos-os), not in the
+# initramfs: its presence enables the grow, removing it disables it.
+[ -f "${rootmnt}/etc/calaos-resize" ] || exit 0
 
 # figure out what disk ROOT is on
 { [ ! -L "${ROOT}" ] && rootdev=${ROOT} || rootdev=$(readlink -f "${ROOT}") ; } ||
@@ -69,7 +68,7 @@ umount "${rootmnt}" ||
 # This is to avoid any other processes using the block device that the
 # root partition is on, which would cause the sfdisk 'BLKRRPART' to fail.
 udevadm settle --timeout ${ROOTDELAY:-30} ||
-	error "GROWROOT: WARNING: udevadm settle prior to growpart failed"
+	msg "WARNING: udevadm settle prior to growpart failed"
 
 if out=$(growpart "${rootdisk}" "${partnum}" 2>&1); then
 	case "$out" in
