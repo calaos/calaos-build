@@ -118,14 +118,14 @@ cat > $efi_mnt/loader/entries/calaos.conf << EOF
 title   Boot USB Calaos v4 Live
 linux   /vmlinuz
 initrd  /initrd.img
-options LABEL=live-efi root=UUID=${uuid_rootfs} rootwait rw init=/lib/systemd/systemd
+options LABEL=live-efi root=UUID=${uuid_rootfs} rootwait console=tty0 rw init=/lib/systemd/systemd
 EOF
 
 cat > $efi_mnt/loader/entries/calaos-install.conf << EOF
 title   Install Calaos OS to disk
 linux   /vmlinuz
 initrd  /initrd.img
-options LABEL=live-efi root=UUID=${uuid_rootfs} rootwait rw init=/lib/systemd/systemd calaos_install
+options LABEL=live-efi root=UUID=${uuid_rootfs} rootwait console=tty0 rw init=/lib/systemd/systemd calaos_install
 EOF
 
 #copy kernel/initramfs to EFI partition to let sd-boot find it

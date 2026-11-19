@@ -13,10 +13,9 @@ esac
 msg() { echo "GROWROOT:" "$@" ; }
 fail() { [ $# -eq 0 ] || msg "$@"; exit 1; }
 
-# do nothing if already resized
-if [ ! -f /etc/calaos-resize ]; then
-	[ -f "${rootmnt}$f" ] && exit 0
-fi
+# The marker lives in the root filesystem (touched in Dockerfile.calaos-os), not in the
+# initramfs: its presence enables the grow, removing it disables it.
+[ -f "${rootmnt}/etc/calaos-resize" ] || exit 0
 
 # figure out what disk ROOT is on
 { [ ! -L "${ROOT}" ] && rootdev=${ROOT} || rootdev=$(readlink -f "${ROOT}") ; } ||
